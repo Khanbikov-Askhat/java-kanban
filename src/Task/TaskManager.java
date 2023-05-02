@@ -180,8 +180,6 @@ public class TaskManager {
         }
         for (Integer key : tasks.keySet()) {
             keyTaskForRemove.add(key);
-            //tasks.remove(key);
-            //System.out.println("Все задачи удалены");
         }
         for(int i = 1; i <= keyTaskForRemove.size(); i ++) {
             tasks.remove(i);
@@ -222,9 +220,7 @@ public class TaskManager {
             System.out.println("Нет созданных подзадач");
         } else {
             for (Integer key : epics.keySet()) {
-                ArrayList<Integer> subtaskToRemove = new ArrayList<>();
                 for (int i = 0; i < epics.get(key).subtasks.size() ; i=i) {
-                    //subtaskToRemove.add(i);
                     epics.get(key).subtasks.remove(i);
                 }
             }
