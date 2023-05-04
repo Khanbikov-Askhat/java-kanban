@@ -1,98 +1,93 @@
-import Task.OutToMenu;
-import java.util.Scanner;
+import manager.TaskManager;
+import task.Epic;
+import task.Subtask;
+import task.Task;
 
 public class Main {
     public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
-        OutToMenu outToMenu = new OutToMenu();
 
+        int staticId = 0;
+        TaskManager manager = new TaskManager();
 
-        while(true) {
-            printMenu();
-            int i = scanner.nextInt();
-            if (i == 1) {
-                String taskNameFirst = "Дописать методы";
-                String taskDescriptionFirst = "Дописать методы ввода информации";
-                outToMenu.addTaskForMenu(taskNameFirst, taskDescriptionFirst);// Добавить первый таск
+        //Создание
+        System.out.println("Создание");
+        Task task1 = new Task("Task #1", "Task1 description", "NEW");
+        Task task2 = new Task("Task #2", "Task2 description", "IN_PROGRESS");
+        int taskId1 = manager.addTask(task1);
+        int taskId2 = manager.addTask(task2);
+        Epic epic1 = new Epic("Epic #1", "Epic1 description","NEW");
+        Epic epic2 = new Epic("Epic #2", "Epic2 description","NEW");
+        int epicId1 = manager.addEpic(epic1);
+        int epicId2 = manager.addEpic(epic2);
+        Subtask subtask1 = new Subtask("Subtask #1-1", "Subtask1 description", "NEW", epicId1);
+        Subtask subtask2 = new Subtask("Subtask #2-1", "Subtask1 description", "NEW", epicId1);
+        Subtask subtask3 = new Subtask("Subtask #3-2", "Subtask1 description", "DONE", epicId2);
+        Integer subtaskId1 = manager.addSubtask(subtask1);
+        Integer subtaskId2 = manager.addSubtask(subtask2);
+        Integer subtaskId3 = manager.addSubtask(subtask3);
+        System.out.println(task1);
+        System.out.println(task2);
+        System.out.println(epic1);
+        System.out.println(epic2);
+        System.out.println(subtask1);
+        System.out.println(subtask2);
+        System.out.println(subtask3);
+        System.out.println();
 
-                String taskNameSecond = "Создать второй тестовый таск";
-                String taskDescriptionSecond = "Создать описание второго тестового таска";
-                outToMenu.addTaskForMenu(taskNameSecond, taskDescriptionSecond);// Добавить второй таск
-            } else if (i == 2) {
-                String epicNameFirst = "Доделать код";
-                String epicDescriptionFirst = "Дописать автоматический ввод информации в методы";
-                outToMenu.addEpicForMenu(epicNameFirst, epicDescriptionFirst);// Добавить эпик
+        // Получение всех задач
+        System.out.println("Получение всех задач");
+        System.out.println(manager.getTasks());
+        System.out.println(manager.getEpics());
+        System.out.println(manager.getSubtasks());
+        System.out.println();
 
-                String epicNameSecond = "Создать тестовый эпик";
-                String epicDescriptionSecond = "Создать тестовый эпик с одной подзадачей";
-                outToMenu.addEpicForMenu(epicNameSecond, epicDescriptionSecond);// Добавить эпик
+        // Получение задач по ID
+        System.out.println("Получение задач по ID");
+        System.out.println(manager.getTask(taskId2));
+        System.out.println(manager.getEpic(epicId2));
+        System.out.println(manager.getSubtask(subtaskId1));
+        System.out.println();
 
-            } else if (i == 3) {
-                int numberOfChoiceFirst = 1;// 1 - Эпик | 2 - Задача
-                int epicIDFirst = 1;
-                String subtaskNameFirst = "Сабтаск первого эпика: Изменить методы";
-                String subtaskDescriptionFirst = "Закоментить чтение данных";
-                outToMenu.addSubtask(numberOfChoiceFirst, epicIDFirst, subtaskNameFirst, subtaskDescriptionFirst);// Добавить подзадачу
+        // Получение задач определенного эпика
+        System.out.println("Получение задач определенного эпика");
+        System.out.println(manager.getEpicsSubtasks(epicId1));
+        System.out.println();
 
-                int numberOfChoiceSecond = 1;// 1 - Эпик | 2 - Задача
-                String subtaskNameSecond = "Сабтаск первого эпика: Изменить метод addSubtask";
-                String subtaskDescriptionSecond = "Добавить параметры в addSubtask";
-                outToMenu.addSubtask(numberOfChoiceSecond, epicIDFirst, subtaskNameSecond, subtaskDescriptionSecond);// Добавить подзадачу
+        // Обновление задачи по ID
+        System.out.println("Обновление задачи по ID");
+        Task task3 = new Task("Task #3", "Task3 description", "IN_PROGRESS");
+        Epic epic3 = new Epic("Epic #3", "Epic3 description","NEW");
+        Subtask subtask4 = new Subtask("Subtask #4-1", "Subtask4 description", "NEW", epicId1);
+        manager.updateTask(task3, taskId1);
+        manager.updateEpic(epic3, epicId1);
+        manager.updateSubtask(subtask4, subtaskId1);
+        System.out.println(manager.getTask(taskId1));
+        System.out.println(manager.getEpic(epicId1));
+        System.out.println(manager.getSubtask(subtaskId1));
+        System.out.println(manager.getTasks());
+        System.out.println(manager.getEpics());
+        System.out.println(manager.getSubtasks());
+        System.out.println();
 
-                int numberOfChoiceThird = 1;// 1 - Эпик | 2 - Задача
-                int epicIDThird = 2;
-                String subtaskNameThird  = "Сабтаск второго эпика: Изменить метод addSubtask";
-                String subtaskDescriptionThird  = "Добавить параметры в addSubtask";
-                outToMenu.addSubtask(numberOfChoiceThird, epicIDThird, subtaskNameThird, subtaskDescriptionThird);// Добавить подзадачу
+        // Удаление задачи по ID
+        System.out.println("Удаление задачи по ID");
+        manager.deleteTask(taskId1);
+        manager.deleteEpic(epicId2);
+        manager.deleteSubtask( subtaskId1);
+        System.out.println(manager.getTasks());
+        System.out.println(manager.getEpics());
+        System.out.println(manager.getSubtasks());
+        System.out.println();
 
-            } else if (i == 4) {
-                outToMenu.printAllTasksEpicsSubtasks(1);// Вывод ВСЕХ задач
-                outToMenu.printAllTasksEpicsSubtasks(2);// Вывод ВСЕХ эпиков
-                outToMenu.printAllTasksEpicsSubtasks(3);// Вывод ВСЕХ подзадач
-            } else if (i == 5) {
-                outToMenu.removeTasksEpicsSubtasks(1);// Удаление ВСЕХ задач
-                outToMenu.removeTasksEpicsSubtasks(3);// Удаление ВСЕХ подзадач
-                outToMenu.removeTasksEpicsSubtasks(2);// Удаление ВСЕХ эпиков
-            } else if (i == 6) {
-                outToMenu.printTaskById(1, 1);// Вывод задачи по ID
-                outToMenu.printEpicById(2,1);// Вывод эпика по ID
-                outToMenu.printSubtaskById(3,1,1);// Вывод подзадачи по ID
-            } else if (i == 7) {
-                outToMenu.updateTaskById(1, 1, 2);// Обновление задачи
-                outToMenu.updateEpicById(2,1);// Обновление эпика
-                outToMenu.updateSubtaskById(3,2,1,1);// Обновление подзадачи
-            } else if (i == 8) {
-                outToMenu.removeTask(1,2);// Удаление задачи по ID
-                outToMenu.removeEpicById(2,2);// Удаление эпика по ID
-                outToMenu.removeSubtaskById(3,1, 1);// Удаление подзадачи по ID
-            } else if (i == 9) {
-                outToMenu.printAllSubtasksByEpic();// Вывод всех подзадач определенного эпика
-            } else if (i == 10) {
-                System.out.println("Пока!");
-                scanner.close();
-            } else {
-                System.out.println("Такой команды нет");
-            }
-        }
+        //Удаление всех задач
+        System.out.println("Удаление всех задач");
+        manager.deleteTasks();
+        manager.deleteEpics();
+        manager.deleteSubtasks();
+        System.out.println(manager.getTasks());
+        System.out.println(manager.getEpics());
+        System.out.println(manager.getSubtasks());
     }
 
-
-
-    //ПРИНТ МЕНЮ
-    static void printMenu() {
-        System.out.println("1 - Добавить задачу.");
-        System.out.println("2 - Добавить эпик.");
-        System.out.println("3 - Добавить подзадачу.");
-        System.out.println("4 - Вывод всех задач/эпиков/подзадач.");
-        System.out.println("5 - Удаление всех задач/эпиков/подзадач.");
-        System.out.println("6 - Получение задачи/эпика/подзадачи по идентификатору.");
-        System.out.println("7 - Обновление задачи/эпика/подзадачи.");
-        System.out.println("8 - Удаление задачи/эпика/подзадачи по индентификатору");
-        System.out.println("9 - Получение всех подзадач определенного эпика.");
-        System.out.println("10 - Выйти из приложения.");
-    }
 }
 
-/*У меня два варианта этого приложения - это вариант который подразумевает чисто тестирование, второй вариант - ручной ввод
-Попытка в тестирование сделала приложение не очень гибким, так как у меня учёт айдишников идёт автоматический, после удаления тасков айдишники не сбрасываются, поэтому epicNumber и taskNumber продолжают увеличиваться
- После полного удаления их можно было бы сбрасывать, но проблема останется при удалении по ID*/
