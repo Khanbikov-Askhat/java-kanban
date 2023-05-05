@@ -9,17 +9,17 @@ public class Main {
 
         //Создание
         System.out.println("Создание");
-        Task task1 = new Task("Task #1", "Task1 description", "NEW");
-        Task task2 = new Task("Task #2", "Task2 description", "IN_PROGRESS");
+        Task task1 = new Task("Task #1", "Task1 description", 0, "NEW");
+        Task task2 = new Task("Task #2", "Task2 description", 0, "IN_PROGRESS");
         int taskId1 = manager.addTask(task1);
         int taskId2 = manager.addTask(task2);
-        Epic epic1 = new Epic("Epic #1", "Epic1 description","NEW");
-        Epic epic2 = new Epic("Epic #2", "Epic2 description","NEW");
+        Epic epic1 = new Epic("Epic #1", "Epic1 description", 0,"NEW");
+        Epic epic2 = new Epic("Epic #2", "Epic2 description", 0,"NEW");
         int epicId1 = manager.addEpic(epic1);
         int epicId2 = manager.addEpic(epic2);
-        Subtask subtask1 = new Subtask("Subtask #1-1", "Subtask1 description", "NEW", epicId1);
-        Subtask subtask2 = new Subtask("Subtask #2-1", "Subtask1 description", "NEW", epicId1);
-        Subtask subtask3 = new Subtask("Subtask #3-2", "Subtask1 description", "DONE", epicId2);
+        Subtask subtask1 = new Subtask("Subtask #1-1", "Subtask1 description", 0, "NEW", epicId1);
+        Subtask subtask2 = new Subtask("Subtask #2-1", "Subtask1 description", 0, "NEW", epicId1);
+        Subtask subtask3 = new Subtask("Subtask #3-2", "Subtask1 description", 0, "DONE", epicId2);
         Integer subtaskId1 = manager.addSubtask(subtask1);
         Integer subtaskId2 = manager.addSubtask(subtask2);
         Integer subtaskId3 = manager.addSubtask(subtask3);
@@ -53,12 +53,12 @@ public class Main {
 
         // Обновление задачи по ID
         System.out.println("Обновление задачи по ID");
-        Task task3 = new Task("Task #3", "Task3 description", "IN_PROGRESS");
-        Epic epic3 = new Epic("Epic #3", "Epic3 description","NEW");
-        Subtask subtask4 = new Subtask("Subtask #4-1", "Subtask4 description", "NEW", epicId1);
-        manager.updateTask(task3, taskId1);
-        manager.updateEpic(epic3, epicId1);
-        manager.updateSubtask(subtask4, subtaskId1);
+        Task task3 = new Task("Task #3", "Task3 description", taskId1, "IN_PROGRESS");
+        Epic epic3 = new Epic("Epic #3", "Epic3 description", epicId1,"NEW");
+        Subtask subtask4 = new Subtask("Subtask #4-1", "Subtask4 description", subtaskId1, "NEW", epicId1);
+        manager.updateTask(task3);
+        manager.updateEpic(epic3);
+        manager.updateSubtask(subtask4);
         System.out.println(manager.getTask(taskId1));
         System.out.println(manager.getEpic(epicId1));
         System.out.println(manager.getSubtask(subtaskId1));
@@ -89,3 +89,12 @@ public class Main {
 
 }
 
+/*Во первых - ОГРОМНОЕ спасибо за ревью которые ты делаешь, они невероятно полезные
+* С созданием объектов - я не знаю, можно ли создавать объекты без внесения ID, точнее можно,
+* но при обновлении ты писал, что мои объекты  и так имеют ID, но это отработает только если в них его передавать,
+* иначе я просто получаю id = 0. Выход который я нашёл, в самом начале при создании перевадать любое число в виде ID,
+* они всё равно переприсваиваются, но возможно есть способ чище.
+* В остальном я вроде как разобрался, ну как минимум я понимаю что к чему, вроде, за исключением final,
+* Не понимаю для чего он нужен во внутренних методах, но об этом спрошу у наставника, наверное или стаковерфлоу
+* Кстати название папки task, у меня с маленькой буквы, я видимо не передал эти изменения в гит.
+* */

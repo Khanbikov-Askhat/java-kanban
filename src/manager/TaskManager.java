@@ -35,18 +35,20 @@ public class TaskManager {
 
 
     //ДОБАВЛЕНИЕ ПОДЗАДАЧИ
-    public int addSubtask(Subtask subtask) {
-        int id = ++generatorId;
+    public Integer addSubtask(Subtask subtask) {
+        int epicId = subtask.getEpicId();
+        Epic epic = epics.get(epicId);
 
+        if (epic == null) {
+            return null;
+        }
+
+        int id = ++generatorId;
         subtask.setId(id);
         subtasks.put(id, subtask);
+        epics.get(epicId).setSubtaskIds(id);
+        checkEpicStatus(epicId);
 
-        for (Integer key: epics.keySet()) {
-            if (key == subtask.getEpicId()) {
-                epics.get(key).setSubtaskIds(id);
-            }
-            checkEpicStatus(key);
-        }
         return id;
     }
 
@@ -71,31 +73,24 @@ public class TaskManager {
 
     //УДАЛЕНИЕ ВСЕХ ЗАДАЧ
     public void deleteTasks() {
-        if (tasks.values().isEmpty()) {
-            return;
-        } else {
-            tasks.clear();
-        }
+        tasks.clear();
     }
 
 
     //УДАЛЕНИЕ ВСЕХ ЭПИКОВ
     public void deleteEpics() {
-        if (epics.values().isEmpty()) {
-            return;
-        } else {
-            epics.clear();
-        }
+        epics.clear();
+        subtasks.clear();
     }
 
 
     //УДАЛЕНИЕ ВСЕХ ПОДЗАДАЧ
     public void deleteSubtasks() {
-        if (subtasks.values().isEmpty()) {
-            return;
-        } else {
-            subtasks.clear();
+        for (Epic epic: epics.values()) {
+            epic.cleanSubtaskIds();
+            checkEpicStatus(epic.getEpicId());
         }
+        subtasks.clear();
     }
 
 
@@ -118,7 +113,8 @@ public class TaskManager {
 
 
     //ОБНОВЛЕНИЕ ЗАДАЧИ
-    public void updateTask(Task task, int id) {
+    public void updateTask(Task task) {
+        int id = task.getId();
         Task saveTask = tasks.get(id);
         if (saveTask == null) {
             return;
@@ -129,70 +125,54 @@ public class TaskManager {
 
 
     //ОБНОВЛЕНИЕ ЭПИКА
-    public void updateEpic(Epic epic, int id) {
-        Epic saveTask = epics.get(id);
-        if (saveTask == null) {
-            return;
-        }
-        epics.put(id, epic);
-        epic.setId(id);
-        for (Integer key: subtasks.keySet()) {
-            if (subtasks.get(key).getEpicId() == id) {
-                epic.setSubtaskIds(key);
-            }
-        }
-        checkEpicStatus(epic.getEpicId());
+    public void updateEpic(Epic epic) {
+        Epic savedEpic = epics.get(epic.getId());
+        savedEpic.setName(epic.getName());
+        savedEpic.setDescription(epic.getDescription());
     }
 
 
     //ОБНОВЛЕНИЕ ПОДЗАДАЧИ
-    public void updateSubtask(Subtask subtask, int id) {
-        Subtask saveTask = subtasks.get(id);
-        if (saveTask == null) {
+    public void updateSubtask(Subtask subtask) {
+        final int id = subtask.getId();
+        final int epicId = subtask.getEpicId();
+        final Subtask savedSubtask = subtasks.get(id);
+        if (savedSubtask == null) {
             return;
         }
-        subtask.setId(id);
+        final Epic epic = epics.get(epicId);
+        if (epic == null) {
+            return;
+        }
         subtasks.put(id, subtask);
-        checkEpicStatus(subtask.getEpicId());
+        checkEpicStatus(epicId);
     }
 
 
     //УДАЛЕНИЕ ЗАДАЧИ ПО ИНДЕНТИФИКАТОРУ
     public void deleteTask(int id) {
-        for (Integer key : tasks.keySet()) {
-            if (key == id) {
-                tasks.remove(id);
-                return;
-            } else {
-                return;
-            }
-        }
+        tasks.remove(id);
     }
 
 
     //УДАЛЕНИЕ ЭПИКА ПО ИНДЕНТИФИКАТОРУ
     public void deleteEpic(int id) {
-        for (Integer key : epics.keySet()) {
-            if (key == id) {
-                epics.remove(id);
-                return;
-            } else {
-                return;
-            }
+        Epic epic = epics.remove(id);
+        for (Integer subtaskId : epic.getSubtaskIds()) {
+            subtasks.remove(subtaskId);
         }
     }
 
 
     //УДАЛЕНИЕ ПОДЗАДАЧИ ПО ИНДЕНТИФИКАТОРУ
     public void deleteSubtask(int id) {
-        for (Integer key : subtasks.keySet()) {
-            if (key == id) {
-                subtasks.remove(id);
-                return;
-            } else {
-                return;
-            }
+        Subtask subtask = subtasks.remove(id);
+        if (subtask == null) {
+            return;
         }
+        Epic epic = epics.get(subtask.getEpicId());
+        epic.removeSubtask(id);
+        checkEpicStatus(epic.getId());
     }
 
 
