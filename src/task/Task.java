@@ -1,20 +1,30 @@
 package task;
 
+import manager.TaskStatus;
+
 import java.util.Objects;
 
 public class Task {
     protected String name;
     protected String description;
     protected int id;
-    protected String status;
+    protected TaskStatus status;
 
 
-    public Task(String name, String description, int id, String status) {
+    public Task(String name, String description) {
+
+        this.name = name;
+        this.description = description;
+        this.status = TaskStatus.NEW;
+
+    }
+
+    public Task(String name, String description, int id) {
 
         this.name = name;
         this.description = description;
         this.id = id;
-        this.status = status;
+        this.status = TaskStatus.NEW;
 
     }
 
@@ -33,10 +43,22 @@ public class Task {
     }
 
     public void setStatus(String newStatus) {
-        status = newStatus;
+        switch(newStatus) {
+            case "NEW":
+                this.status = TaskStatus.NEW;
+                break;
+            case "IN_PROGRESS":
+                this.status = TaskStatus.IN_PROGRESS;
+                break;
+            case "DONE":
+                this.status = TaskStatus.DONE;
+                break;
+            default:
+                System.out.println("Такого статуса нет");
+        }
     }
 
-    public String getStatus() {
+    public TaskStatus getStatus() {
         return status;
     }
 
