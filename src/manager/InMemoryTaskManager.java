@@ -8,10 +8,10 @@ import java.util.List;
 
 public class InMemoryTaskManager implements TaskManager{
 
-    private HashMap<Integer, Task> tasks = new HashMap<>();
-    private HashMap<Integer, Epic> epics = new HashMap<>();
-    private HashMap<Integer, Subtask> subtasks = new HashMap<>();
-    private HistoryManager historyManager = Managers.getDefaultHistory();
+    private final HashMap<Integer, Task> tasks = new HashMap<>();
+    private final HashMap<Integer, Epic> epics = new HashMap<>();
+    private final HashMap<Integer, Subtask> subtasks = new HashMap<>();
+    private final HistoryManager historyManager = Managers.getDefaultHistory();
 
     private int generatorId = 0;
 
@@ -108,24 +108,27 @@ public class InMemoryTaskManager implements TaskManager{
     //ПОЛУЧЕНИЕ ЗАДАЧИ ПО ИДЕНТИФИКАТОРУ
     @Override
     public Task getTask(int id) {
-        historyManager.add(tasks.get(id));
-        return tasks.get(id);
+        Task task = tasks.get(id);
+        historyManager.add(task);
+        return task;
     }
 
 
     //ПОЛУЧЕНИЕ ЭПИКА ПО ИДЕНТИФИКАТОРУ
     @Override
     public Epic getEpic(int id) {
-        historyManager.add(epics.get(id));
-        return epics.get(id);
+        Epic epic = epics.get(id);
+        historyManager.add(epic);
+        return epic;
     }
 
 
     //ПОЛУЧЕНИЕ ПОДЗАДАЧИ ПО ИДЕНТИФИКАТОРУ
     @Override
     public Subtask getSubtask(int id) {
-        historyManager.add(subtasks.get(id));
-        return subtasks.get(id);
+        Subtask subtask = subtasks.get(id);
+        historyManager.add(subtask);
+        return subtask;
     }
 
 
@@ -215,8 +218,15 @@ public class InMemoryTaskManager implements TaskManager{
     }
 
 
+    //ПОЛУЧЕНИЕ ИСТОРИИ ИЗМЕНЕНИЙ
+    @Override
+    public List<Task> getDefaultHistory() {
+        return historyManager.getHistory();
+    }
+
+
     //ПРОВЕРКА СТАТУСОВ У ЭПИКОВ
-    public void checkEpicStatus(int epicId) {
+    private void checkEpicStatus(int epicId) {
         int statusDone = 0;
         int statusNew = 0;
 
@@ -241,13 +251,5 @@ public class InMemoryTaskManager implements TaskManager{
             epics.get(epicId).setStatus("IN_PROGRESS");
         }
     }
-
-
-    //@Override
-    public List<Task> getDefaultHistory() {
-        return historyManager.getHistory();
-    }
-
-
 
 }

@@ -2,12 +2,9 @@ package manager;
 import task.Epic;
 import task.Subtask;
 import task.Task;
-import java.util.ArrayList;
-
-
+import java.util.List;
 
 public interface TaskManager {
-
 
 
     //ДОБАВЛЕНИЕ НОВОГО ТАСКА
@@ -23,15 +20,15 @@ public interface TaskManager {
 
 
     //ПОЛУЧЕНИЕ ВСЕХ ЗАДАЧ
-    ArrayList<Task> getTasks();
+    List<Task> getTasks();
 
 
     //ПОЛУЧЕНИЕ ВСЕХ ЭПИКОВ
-    ArrayList<Epic> getEpics();
+    List<Epic> getEpics();
 
 
     //ПОЛУЧЕНИЕ ВСЕХ ПОДЗАДАЧ
-    ArrayList<Subtask> getSubtasks();
+    List<Subtask> getSubtasks();
 
 
     //УДАЛЕНИЕ ВСЕХ ЗАДАЧ
@@ -83,8 +80,7 @@ public interface TaskManager {
 
 
     //ПОЛУЧЕНИЕ ВСЕХ ПОДЗАДАЧ ОПРЕДЕЛЕННОГО ЭПИКА
-     ArrayList<Subtask> getEpicsSubtasks(int epicId);
+    List<Subtask> getEpicsSubtasks(int epicId);
 
-
-
+    List<Task> getDefaultHistory();
 }

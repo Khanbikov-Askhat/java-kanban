@@ -1,11 +1,12 @@
 import manager.InMemoryTaskManager;
+import manager.TaskManager;
 import task.Epic;
 import task.Subtask;
 import task.Task;
 
 public class Main {
     public static void main(String[] args) {
-        InMemoryTaskManager manager = new InMemoryTaskManager();
+        TaskManager manager = new InMemoryTaskManager();
 
         //Создание
         System.out.println("Создание");
@@ -78,9 +79,6 @@ public class Main {
 
 }
 
-/* Понятия не имею что я вообще сделал и почему это отрабатывает
-* Я абсолютно не понял задания, я сделал первую часть с историей, хорошо, оно понятно,
-* что можно создавать список внутри InMemoryTaskManager и отткуда его выводить, а вот дальше с этими историями,
-* с кучей интерфейсов и классов, не знаю, сложно. Это конечно работает, но я не знаю почемуXD
-
-* */
+/* Благодарю за ревью, у меня и вопросы то разрешились, я всё время забывал, что можно возвращать объекты, которые
+* имплементируют интерфейсы, теперь хоть есть понимание того, что я делаю.
+* Постараюсь запомнить про дублирование кода и лишние поиски элементов */
