@@ -17,21 +17,19 @@ public class Epic extends Task {
         super(name, description, id);
     }
 
+
+    public Epic(String taskLine) {
+        super(taskLine);
+    }
+
     @Override
     public String toString() {
-        String result = "Epic{" + // имя класса
-                "name='" + name + '\'' + // Название
-                ", description='" + description + '\'' + // Описание
-                ", id=" + id + // айди
-                ", status=" + status + // статус
-                '}';
-
-        if (subtaskIds != null) {
-            result = result + ", subtaskIds.length=" + subtaskIds.size();
-        } else {
-            result = result + ", subtaskIds.length=null";
-        }
-        return result + '}';
+        return id +
+                ",EPIC" + "," +
+                name + "," +
+                status + "," +
+                description
+                ;
     }
 
     public int getEpicId() {
@@ -61,4 +59,10 @@ public class Epic extends Task {
     public void removeSubtask(Object o) {
         subtaskIds.remove(o);
     }
+
+    @Override
+    public TaskType getTaskType() {
+        return TaskType.EPIC;
+    }
+
 }

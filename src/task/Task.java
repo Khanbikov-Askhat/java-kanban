@@ -25,14 +25,22 @@ public class Task {
 
     }
 
+    public Task(String taskLine) {
+        String[] task = taskLine.split(",");
+        this.id = Integer.parseInt(task[0]);
+        this.name = task[2];
+        this.status = status.valueOf(task[3]);
+        this.description = task[4];
+    }
+
     @Override
     public String toString() {
-        return "Task{" + // имя класса
-                "name='" + name + '\'' + // название
-                ", description='" + description + '\'' + // описание
-                ", id=" + id + // айди
-                ", status=" + status + // статус
-                '}';
+        return id +
+                ",TASK" + "," +
+                name + "," +
+                status + "," +
+                description
+                ;
     }
 
     public void setId(int newId) {
@@ -104,5 +112,8 @@ public class Task {
         return hash;
     }
 
+    public TaskType getTaskType() {
+        return TaskType.TASK;
+    }
 
 }

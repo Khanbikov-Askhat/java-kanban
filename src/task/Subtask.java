@@ -14,25 +14,20 @@ public class Subtask extends Task {
         this.epicId = epicId;
     }
 
-    public Subtask(String name,
-                   String description,
-                   int id,
-                   int epicId) {
-
-        super(name, description, id);
-
-        this.epicId = epicId;
+    public Subtask(String taskLine) {
+        super(taskLine);
+        String[] subTask = taskLine.split(",");
+        this.epicId = Integer.parseInt(subTask[5]);
     }
 
     @Override
     public String toString() {
-        return "Subtask{" + // имя класса
-                "name='" + name + '\'' + // Название подзадачи
-                ", description='" + description + '\'' + // Описание задачи
-                ", id=" + id + // ID подзадачи
-                ", status=" + status + // Статус подзадачи
-                ", epicId=" + epicId + // ID эпика
-                '}';
+        return id +
+                ",SUBTASK" + "," +
+                name + "," +
+                status + "," +
+                description + "," + epicId
+                ;
     }
 
     public int getEpicId() {
@@ -43,5 +38,9 @@ public class Subtask extends Task {
         epicId = newEpicId;
     }
 
+    @Override
+    public TaskType getTaskType() {
+        return TaskType.SUBTASK;
+    }
 }
 
