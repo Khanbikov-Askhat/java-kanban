@@ -20,6 +20,11 @@ public class Subtask extends Task {
         this.epicId = Integer.parseInt(subTask[5]);
     }
 
+    public Subtask(int id, String name, String description, TaskStatus status, int epicId) {
+        super(id, name, description, status);
+        this.epicId = epicId;
+    }
+
     @Override
     public String toString() {
         return id +

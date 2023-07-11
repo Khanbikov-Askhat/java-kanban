@@ -6,6 +6,8 @@ public class Task {
     protected String description;
     protected int id;
     protected TaskStatus status;
+    protected int epicId;
+
 
 
     public Task(String name, String description) {
@@ -31,6 +33,13 @@ public class Task {
         this.name = task[2];
         this.status = status.valueOf(task[3]);
         this.description = task[4];
+    }
+
+    public Task(int id, String name, String description, TaskStatus status) {
+        this.name = name;
+        this.description = description;
+        this.id = id;
+        this.status = status;
     }
 
     @Override
