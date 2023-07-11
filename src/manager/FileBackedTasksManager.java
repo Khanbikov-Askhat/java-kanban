@@ -99,17 +99,17 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
             writer.newLine();
             for (Map.Entry<Integer, Task> entry : tasks.entrySet()) {
                 final Task task = entry.getValue();
-                writer.write(task.toString());
+                writer.write(CSVTaskFormat.toString(task));
                 writer.newLine();
             }
             for (Map.Entry<Integer, Subtask> entry : subtasks.entrySet()) {
                 final Task task = entry.getValue();
-                writer.write(task.toString());
+                writer.write(CSVTaskFormat.toString(task));
                 writer.newLine();
             }
             for (Map.Entry<Integer, Epic> entry : epics.entrySet()) {
                 final Task task = entry.getValue();
-                writer.write(task.toString());
+                writer.write(CSVTaskFormat.toString(task));
                 writer.newLine();
             }
             writer.newLine();
@@ -284,4 +284,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
 Пока я оставил всё в переопределении базового метода, он вроде как работает и всё верно вызывает.
 Пока я этот метод только закомментировал, удалять не стал.
 С остальным я разобрался вроде, вот этот вопрос только остался.
+
+P.S.
+Хотя я вот поправил метод на SUBTASK и всё отработало
 * */

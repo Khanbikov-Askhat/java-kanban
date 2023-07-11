@@ -25,13 +25,11 @@ public class CSVTaskFormat {
         return sb.toString();
     }
 
-    /*
     public static String toString(Task task) {
         return task.getId() + "," + task.getTaskType() + "," + task.getName() + "," +
                 task.getStatus() + "," + task.getDescription() + "," +
-                (task.getTaskType().equals(TaskType.EPIC) ? ((Subtask)task).getEpicId() : "");
+                (task.getTaskType().equals(TaskType.SUBTASK) ? ((Subtask)task).getEpicId() : "");
     }
-    */
 
     static List<Integer> historyFromString(String historyLine) {
         List<Integer> ids = new ArrayList<>();
