@@ -8,7 +8,7 @@ public interface TaskManager {
 
 
     //ДОБАВЛЕНИЕ НОВОГО ТАСКА
-    int addTask(Task task);
+    Integer addTask(Task task);
 
 
     //ДОБАВЛЕНИЕ НОВОГО ЭПИКА
@@ -83,4 +83,8 @@ public interface TaskManager {
     List<Subtask> getEpicsSubtasks(int epicId);
 
     List<Task> getDefaultHistory();
+
+    List<Task> getPrioritizedTasks();
+
+    HistoryManager getHistoryManager();
 }

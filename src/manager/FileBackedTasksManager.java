@@ -18,79 +18,6 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         this.file = file;
     }
 
-    public static void main(String[] args) {
-
-        TaskManager managerFirst = Managers.getDefault();
-
-        //Создание
-        System.out.println("Создание");
-        Task task1 = new Task("Task #1", "Task1 description");
-        Task task2 = new Task("Task #2", "Task2 description");
-        int taskId1 = managerFirst.addTask(task1);
-        int taskId2 = managerFirst.addTask(task2);
-        Epic epic1 = new Epic("Epic #1", "Epic1 description");
-        Epic epic2 = new Epic("Epic #2", "Epic2 description");
-        int epicId1 = managerFirst.addEpic(epic1);
-        int epicId2 = managerFirst.addEpic(epic2);
-        Subtask subtask1 = new Subtask("Subtask #1-1", "Subtask1 description", epicId1);
-        Subtask subtask2 = new Subtask("Subtask #2-1", "Subtask2 description", epicId1);
-        Subtask subtask3 = new Subtask("Subtask #3-1", "Subtask3 description", epicId1);
-        Integer subtaskId1 = managerFirst.addSubtask(subtask1);
-        Integer subtaskId2 = managerFirst.addSubtask(subtask2);
-        Integer subtaskId3 = managerFirst.addSubtask(subtask3);
-
-        // Получение задач по ID
-        System.out.println("Получение задач по ID в первый раз");
-        System.out.println(managerFirst.getTask(taskId1));
-        System.out.println(managerFirst.getTask(taskId2));
-        System.out.println(managerFirst.getEpic(epicId1));
-        System.out.println(managerFirst.getEpic(epicId2));
-        System.out.println(managerFirst.getSubtask(subtaskId1));
-        System.out.println(managerFirst.getSubtask(subtaskId2));
-        System.out.println(managerFirst.getSubtask(subtaskId3));
-        System.out.println();
-
-
-        //Принт всех задач
-        System.out.println(managerFirst.getTasks());
-        System.out.println(managerFirst.getEpics());
-        System.out.println(managerFirst.getSubtasks());
-        System.out.println();
-
-        // Получение истории задач
-        System.out.println("Получение истории задач в первый раз");
-        System.out.println(managerFirst.getDefaultHistory());
-        System.out.println();
-
-
-        File save = new File("./resources/task.csv");
-        final TaskManager historyTaskManager = FileBackedTasksManager.loadFromFile(save);
-
-        // Получение истории задач из файла
-        System.out.println("Получение истории задач из файла");
-        System.out.println(historyTaskManager.getDefaultHistory());
-        System.out.println();
-
-
-        //Принт всех задач
-        System.out.println(historyTaskManager.getTasks());
-        System.out.println(historyTaskManager.getEpics());
-        System.out.println(historyTaskManager.getSubtasks());
-        System.out.println();
-
-
-        // Получение задач по ID
-        System.out.println("Получение задач по ID в первый раз");
-        System.out.println(historyTaskManager.getTask(taskId1));
-        System.out.println(historyTaskManager.getTask(taskId2));
-        System.out.println(historyTaskManager.getEpic(epicId1));
-        System.out.println(historyTaskManager.getEpic(epicId2));
-        System.out.println(historyTaskManager.getSubtask(subtaskId1));
-        System.out.println(historyTaskManager.getSubtask(subtaskId2));
-        System.out.println(historyTaskManager.getSubtask(subtaskId3));
-        System.out.println();
-
-    }
 
     //СОХРАНЕНИЕ ФАЙЛА
     protected void save() {
@@ -129,7 +56,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
     }
 
     @Override
-    public int addTask(Task task) {
+    public Integer addTask(Task task) {
         super.addTask(task);
         save();
         return task.getId();
@@ -212,6 +139,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         save();
     }
 
+
     public static FileBackedTasksManager loadFromFile(File file) {
         final FileBackedTasksManager taskManager = new FileBackedTasksManager(file);
         try {
@@ -242,7 +170,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
             }
             taskManager.generatorId = generatorId;
         } catch (IOException e) {
-            throw new ManagerSaveException("Can't read form file: " + file.getName(), e);
+            throw new ManagerSaveException("Can't read from file: " + file.getName(), e);
         }
         return taskManager;
     }
@@ -273,18 +201,16 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         }
         return epics.get(id);
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        FileBackedTasksManager fileBackedTasksManager = (FileBackedTasksManager) o;
+        return tasks.equals(fileBackedTasksManager.tasks) && epics.equals(fileBackedTasksManager.epics)
+                && subtasks.equals(fileBackedTasksManager.subtasks)
+                && historyManager.equals(fileBackedTasksManager.historyManager);
+    }
+
 }
 
-
-/*
-Спасибо за ревью!
-Я, честно, не разобрался с методом toString в CSVTaskFormat, он у меня записывал epicId в эпики, что не соответствовало
-формату и он вылетал в ошибку. Плюс появилась необходимость создать метод в Task, что мне кажется странно,
-там метода быть не должно.
-Пока я оставил всё в переопределении базового метода, он вроде как работает и всё верно вызывает.
-Пока я этот метод только закомментировал, удалять не стал.
-С остальным я разобрался вроде, вот этот вопрос только остался.
-
-P.S.
-Хотя я вот поправил метод на SUBTASK и всё отработало
-* */

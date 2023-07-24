@@ -1,13 +1,17 @@
 package task;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class Epic extends Task {
     private ArrayList<Integer> subtaskIds = new ArrayList<>();
-
+    private LocalDateTime endTime;
     public Epic(String name,
                 String description) {
 
-        super(name, description);
+        super(name, description, "PT0M", LocalDateTime.MAX.toString());
+        endTime = LocalDateTime.MIN;
     }
 
     public Epic(String name,
@@ -69,4 +73,30 @@ public class Epic extends Task {
         return TaskType.EPIC;
     }
 
+    @Override
+    public LocalDateTime getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(LocalDateTime endTime) {
+        this.endTime = endTime;
+    }
+
+    public void increaseDuration(Duration duration) {
+        this.duration = this.duration.plus(duration);
+    }
+
+    public void subtractionDuration(Duration duration) {
+        this.duration = this.duration.minus(duration);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false; // можно оформить и так
+        Epic epic = (Epic) obj;
+        return Objects.equals(name, epic.name) &&
+                Objects.equals(description, epic.description) &&
+                Objects.equals(status, epic.status);
+    }
 }

@@ -1,5 +1,7 @@
 package task;
 
+import java.util.Objects;
+
 public class Subtask extends Task {
 
     private int epicId;
@@ -25,6 +27,15 @@ public class Subtask extends Task {
         this.epicId = epicId;
     }
 
+    public Subtask(Integer epicId, String name, String description, String durationMinutes, String startTime) {
+        super(name, description, durationMinutes, startTime);
+        this.epicId = epicId;
+    }
+    public Subtask(int id, Integer epicId, String name, String description, String durationMinutes, String startTime) {
+        super(name, description, durationMinutes, startTime);
+        this.epicId = epicId;
+    }
+
     @Override
     public String toString() {
         return id +
@@ -46,6 +57,18 @@ public class Subtask extends Task {
     @Override
     public TaskType getTaskType() {
         return TaskType.SUBTASK;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false; // можно оформить и так
+        Subtask subtask = (Subtask) obj;
+        return Objects.equals(name, subtask.name) &&
+                Objects.equals(description, subtask.description) &&
+                Objects.equals(status, subtask.status) &&
+                subtask.startTime.isEqual(startTime) &&
+                subtask.duration.equals(duration);
     }
 }
 

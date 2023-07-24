@@ -1,4 +1,8 @@
 package task;
+import exceptions.TaskCreateException;
+
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 public class Task {
@@ -6,8 +10,8 @@ public class Task {
     protected String description;
     protected int id;
     protected TaskStatus status;
-    protected int epicId;
-
+    protected Duration duration;
+    protected LocalDateTime startTime;
 
 
     public Task(String name, String description) {
@@ -25,6 +29,18 @@ public class Task {
         this.id = id;
         this.status = TaskStatus.NEW;
 
+    }
+
+    public Task(String name, String description, String durationMinutes, String startTime) {
+        if (name == null || description == null || durationMinutes == null || startTime == null) {
+            throw new TaskCreateException("Can't create Task");
+        }
+        this.name = name;
+        this.description = description;
+        this.id = 0;
+        this.status = TaskStatus.NEW;
+        this.duration = Duration.parse(durationMinutes);
+        this.startTime = LocalDateTime.parse(startTime);
     }
 
     public Task(String taskLine) {
@@ -100,11 +116,13 @@ public class Task {
     public boolean equals(Object obj) {
         if (this == obj) return true;
         if (obj == null || getClass() != obj.getClass()) return false; // можно оформить и так
-        Task otherBook = (Task) obj;
-        return Objects.equals(name, otherBook.name) &&
-                Objects.equals(description, otherBook.description) &&
-                (id == otherBook.id) &&
-                Objects.equals(status, otherBook.status);
+        Task task = (Task) obj;
+        return Objects.equals(name, task.name) &&
+                Objects.equals(description, task.description) &&
+                (id == task.id) &&
+                Objects.equals(status, task.status) &&
+                task.startTime.isEqual(startTime) &&
+                task.duration.equals(duration);
     }
 
     @Override
@@ -125,4 +143,27 @@ public class Task {
         return TaskType.TASK;
     }
 
+    public void setStartTime(LocalDateTime startTime) {
+        this.startTime = startTime;
+    }
+
+    public LocalDateTime getStartTime() {
+        return startTime;
+    }
+
+    public void setDuration(Duration duration) {
+        this.duration = duration;
+    }
+
+    public Duration getDuration() {
+        return duration;
+    }
+
+    public LocalDateTime getEndTime() {
+        if (startTime.isEqual(LocalDateTime.MAX)) {
+            return LocalDateTime.MIN;
+        } else {
+            return startTime.plus(duration);
+        }
+    }
 }
