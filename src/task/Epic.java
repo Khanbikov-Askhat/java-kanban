@@ -10,7 +10,7 @@ public class Epic extends Task {
     public Epic(String name,
                 String description) {
 
-        super(name, description, "PT0M", LocalDateTime.MAX.toString());
+        super(name, description, null, LocalDateTime.MAX.toString());
         endTime = LocalDateTime.MIN;
     }
 
@@ -82,12 +82,12 @@ public class Epic extends Task {
         this.endTime = endTime;
     }
 
-    public void increaseDuration(Duration duration) {
-        this.duration = this.duration.plus(duration);
+    public void increaseDuration(Long duration) {
+        this.duration = this.duration + duration;
     }
 
-    public void subtractionDuration(Duration duration) {
-        this.duration = this.duration.minus(duration);
+    public void subtractionDuration(Long duration) {
+        this.duration = this.duration - duration;
     }
 
     @Override

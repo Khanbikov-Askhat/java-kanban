@@ -10,7 +10,7 @@ public class Task {
     protected String description;
     protected int id;
     protected TaskStatus status;
-    protected Duration duration;
+    protected Long duration;
     protected LocalDateTime startTime;
 
 
@@ -31,15 +31,15 @@ public class Task {
 
     }
 
-    public Task(String name, String description, String durationMinutes, String startTime) {
-        if (name == null || description == null || durationMinutes == null || startTime == null) {
+    public Task(String name, String description, Long durationMinutes, String startTime) {
+        if (name == null || description == null || startTime == null) {
             throw new TaskCreateException("Can't create Task");
         }
         this.name = name;
         this.description = description;
         this.id = 0;
         this.status = TaskStatus.NEW;
-        this.duration = Duration.parse(durationMinutes);
+        this.duration = durationMinutes;
         this.startTime = LocalDateTime.parse(startTime);
     }
 
@@ -151,11 +151,11 @@ public class Task {
         return startTime;
     }
 
-    public void setDuration(Duration duration) {
+    public void setDuration(Long duration) {
         this.duration = duration;
     }
 
-    public Duration getDuration() {
+    public Long getDuration() {
         return duration;
     }
 
@@ -163,7 +163,7 @@ public class Task {
         if (startTime.isEqual(LocalDateTime.MAX)) {
             return LocalDateTime.MIN;
         } else {
-            return startTime.plus(duration);
+            return startTime.plus(Duration.ofMinutes(duration));
         }
     }
 }

@@ -1,4 +1,5 @@
-import exceptions.TaskOverlapAnotherTaskException;
+package manager;
+
 import manager.TaskManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -7,14 +8,12 @@ import task.Subtask;
 import task.Task;
 import task.TaskStatus;
 
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-abstract class TaskManagerTest <T extends TaskManager>{
+abstract class TaskManagerTest <T extends TaskManager> {
 
     private T taskManager;
 
@@ -26,13 +25,13 @@ abstract class TaskManagerTest <T extends TaskManager>{
         Task task1 = new Task(
                 "Task1",
                 "Task1",
-                "PT30M",
+                30L,
                 "2023-07-24T06:00:00");
 
         Task task2 = new Task(
                 "Task2",
                 "Task2",
-                "PT30M",
+                30L,
                 "2023-07-24T14:00:00");
 
         Epic epic1 = new Epic(
@@ -50,25 +49,25 @@ abstract class TaskManagerTest <T extends TaskManager>{
         Subtask subtask1 = new Subtask(
                 3, "SubTask1",
                 "SubTask1",
-                "PT30M",
+                30L,
                 "2023-07-24T09:00:00");
 
         Subtask subtask2 = new Subtask(
                 3, "SubTask2",
                 "SubTask2",
-                "PT30M",
+                30L,
                 "2023-07-24T10:00:00");
 
         Subtask subtask3 = new Subtask(
                 4, "SubTask3",
                 "SubTask3",
-                "PT30M",
+                30L,
                 "2023-07-23T09:00:00");
 
         Subtask subtask4 = new Subtask(
                 4, "SubTask4",
                 "SubTask4",
-                "PT30M",
+                30L,
                 "2023-07-22T12:00:00");
 
         taskManager.addTask(task1);
@@ -82,6 +81,78 @@ abstract class TaskManagerTest <T extends TaskManager>{
         taskManager.addSubtask(subtask4);
     }
 
+    //ТЕСТИРОВАНИЕ ЭПИКОВ_______________________________________________________________________________________________
+    //ДОЛЖЕН ВЕРНУТЬ СТАТУС NEW ИЗ ЭПИКА БЕЗ САБТАСКОВ
+    @Test
+    public void shouldReturnStatusNewFromEpicWithEmptySubtasksList() {
+        Epic epic = new Epic("Epic #1", "Epic1 description");
+        int epicId = taskManager.addEpic(epic);
+        assertEquals(TaskStatus.NEW, taskManager.getEpic(epicId).getStatus());
+    }
+    //ДОЛЖЕН ВЕРНУТЬ СТАТУС NEW ИЗ ЭПИКА С САБТАСКОЙ СО СТАТУСОМ NEW
+    @Test
+    public void shouldReturnStatusNewFromEpicWithSubtasksListWithStatusNew() {
+        Epic epic = new Epic("Epic #1", "Epic1 description");
+        int epicId = taskManager.addEpic(epic);
+        Subtask subtask = new Subtask(epicId, "Subtask #1-1",
+                "Subtask1 description",
+                30L,
+                "2023-07-29T12:00:00");
+        int subtaskId = taskManager.addSubtask(subtask);
+        assertEquals(TaskStatus.NEW, taskManager.getEpic(epicId).getStatus());
+    }
+    //ДОЛЖЕН ВЕРНУТЬ СТАТУС DONE ИЗ ЭПИКА С САБТАСКОЙ СО СТАТУСОМ DONE
+    @Test
+    public void shouldReturnStatusDoneFromEpicWithSubtasksListWithStatusDone() {
+        Epic epic = new Epic("Epic #1", "Epic1 description");
+        int epicId = taskManager.addEpic(epic);
+        Subtask subtask1 = new Subtask(epicId, "Subtask #1-1",
+                "Subtask1 description",
+                30L,
+                "2023-07-29T12:00:00");
+        int subtaskId1 = taskManager.addSubtask(subtask1);
+        taskManager.updateSubtask(subtask1, "DONE");
+        assertEquals(TaskStatus.DONE, taskManager.getEpic(epicId).getStatus());
+    }
+    //ДОЛЖЕН ВЕРНУТЬ СТАТУС IN_PROGRESS ИЗ ЭПИКА С САБТАСКАМИ СО СТАТУСАМИ NEW И DONE
+    @Test
+    public void shouldReturnStatusInProgressFromEpicWithSubtasksListWithStatusNewAndDone() {
+        Epic epic = new Epic("Epic #1", "Epic1 description");
+        int epicId = taskManager.addEpic(epic);
+        Subtask subtask1 = new Subtask(epicId, "Subtask #1-1",
+                "Subtask1 description",
+                30L,
+                "2023-07-28T12:00:00");
+        int subtaskId1 = taskManager.addSubtask(subtask1);
+        Subtask subtask2 = new Subtask(epicId,
+                "Subtask #2-1",
+                "Subtask2 description",
+                30L,
+                "2023-07-29T12:00:00");
+        int subtaskId2 = taskManager.addSubtask(subtask2);
+        taskManager.updateSubtask(subtask1, "DONE");
+        assertEquals(TaskStatus.IN_PROGRESS, taskManager.getEpic(epicId).getStatus());
+    }
+    //ДОЛЖЕН ВЕРНУТЬ СТАТУС IN_PROGRESS ИЗ ЭПИКА С САБТАСКАМИ СО СТАТУСАМИ IN_PROGRESS
+    @Test
+    public void shouldReturnStatusInProgressFromEpicWithSubtasksListWithStatusInProgress() {
+        Epic epic = new Epic("Epic #1", "Epic1 description");
+        int epicId = taskManager.addEpic(epic);
+        Subtask subtask1 = new Subtask(epicId, "Subtask #1-1",
+                "Subtask1 description",
+                30L,
+                "2023-07-28T12:00:00");
+        int subtaskId1 = taskManager.addSubtask(subtask1);
+        Subtask subtask2 = new Subtask(epicId,
+                "Subtask #2-1",
+                "Subtask2 description",
+                30L,
+                "2023-07-29T12:00:00");
+        int subtaskId2 = taskManager.addSubtask(subtask2);
+        taskManager.updateSubtask(subtask1, "IN_PROGRESS");
+        assertEquals(TaskStatus.IN_PROGRESS, taskManager.getEpic(epicId).getStatus());
+    }
+
 
     //ДОБАВЛЕНИЕ ЗАДАЧ__________________________________________________________________________________________________
     //ДОЛЖЕН ДОБАВИТЬ НОВУЮ ТАСКУ
@@ -90,7 +161,7 @@ abstract class TaskManagerTest <T extends TaskManager>{
         Task expectedTask = new Task(
                 "Test Task",
                 "Test Task",
-                "PT30M",
+                30L,
                 "2023-07-25T12:00:00");
         taskManager.addTask(expectedTask);
         Task testedTask = taskManager.getTask(10);
@@ -113,7 +184,7 @@ abstract class TaskManagerTest <T extends TaskManager>{
                 3,
                 "Test Subtask",
                 "Test Subtask",
-                "PT30M",
+                30L,
                 "2023-07-24T07:00:00");
         taskManager.addSubtask(expectedSubtask);
         Subtask testedSubtask = taskManager.getSubtask(10);
@@ -127,7 +198,7 @@ abstract class TaskManagerTest <T extends TaskManager>{
                 10,
                 "New Subtask",
                 "New Subtask",
-                "PT30M",
+                30L,
                 "2023-07-24T07:00:00");
         taskManager.addSubtask(expectedSubtask);
         Subtask testedSubtask = taskManager.getSubtask(6);
@@ -223,8 +294,24 @@ abstract class TaskManagerTest <T extends TaskManager>{
         int expectedSize = 0;
         assertEquals(expectedSize, subTasksOfEpic.size());
     }
-
-
+    //НЕ ДОЛЖЕН ВЕЗВРАЩАТЬ ЭПИК С ID 1
+    @Test
+    void shouldNotReturnEpicWithId1() {
+        Epic testedEpic = taskManager.getEpic(1);
+        assertNull(testedEpic, "Epic found");
+    }
+    //НЕ ДОЛЖЕН ВЕЗВРАЩАТЬ ТАСК С ID 5
+    @Test
+    void shouldNotReturnTaskWithId5() {
+        Task testedTask = taskManager.getTask(5);
+        assertNull(testedTask, "Task found");
+    }
+    //НЕ ДОЛЖЕН ВЕЗВРАЩАТЬ САБТАСК С ID 1
+    @Test
+    void shouldNotReturnSubtaskWithWrongId1() {
+        Subtask testedSubtask = taskManager.getSubtask(1);
+        assertNull(testedSubtask, "Subtask found");
+    }
     //ОБНОВЛЕНИЕ ЗАДАЧ__________________________________________________________________________________________________
     //ДОЛЖЕН ОБНОВИТЬ ТАСКУ
     @Test
@@ -232,7 +319,7 @@ abstract class TaskManagerTest <T extends TaskManager>{
         Task expectedTask = new Task(
                 "Updated Task",
                 "Updated Task",
-                "PT30M",
+                30L,
                 "2023-07-24T12:00:00");
         expectedTask.setId(1);
         taskManager.updateTask(expectedTask, "NEW");
@@ -257,7 +344,7 @@ abstract class TaskManagerTest <T extends TaskManager>{
                 3,
                 "Updated Subtask",
                 "Updated Subtask",
-                "PT30M",
+                30L,
                 "2023-07-24T07:00:00");
         expectedSubtask.setId(6);
         taskManager.updateSubtask(expectedSubtask, "NEW");
@@ -316,8 +403,27 @@ abstract class TaskManagerTest <T extends TaskManager>{
         Subtask expectedSubtask = taskManager.getSubtask(6);
         assertNull(expectedSubtask, "Subtask was not deleted");
     }
-
-
+    //НЕ ДОЛЖЕН УДАЛЯТЬ ТАСК С ID 3
+    @Test
+    void shouldNotDeleteTaskWithWrongId3() {
+        taskManager.deleteTask(3);
+        Task expectedTask = taskManager.getTask(3);
+        assertNull(expectedTask, "Task was deleted");
+    }
+    //НЕ ДОЛЖЕН УДАЛЯТЬ ЭПИК С ID 1
+    @Test
+    void shouldNotDeleteEpicWithWrongId1() {
+        taskManager.deleteEpic(1);
+        Epic expectedEpic = taskManager.getEpic(1);
+        assertNull(expectedEpic, "Epic was deleted");
+    }
+    //НЕ ДОЛЖЕН УДАЛЯТЬ САБТАСК С ID 1
+    @Test
+    void shouldNotDeleteSubtaskWithWrongId1() {
+        taskManager.deleteSubtask(1);
+        Subtask expectedSubtask = taskManager.getSubtask(1);
+        assertNull(expectedSubtask, "Subtask was deleted");
+    }
     //УДАЛЕНИЕ ВСЕХ ЗАДАЧ_______________________________________________________________________________________________
     //ДОЛЖЕН УДАЛИТЬ ВСЕ ТАСКИ
     @Test
@@ -387,7 +493,7 @@ abstract class TaskManagerTest <T extends TaskManager>{
         Task expectedTask = new Task(
                 "Test Task",
                 "Test Task",
-                "PT30M",
+                30L,
                 "2023-07-21T12:00:00");
         taskManager.addTask(expectedTask);
         List<Task> afterAddNewTaskSortByPriorityTasks = taskManager.getPrioritizedTasks();
@@ -408,7 +514,7 @@ abstract class TaskManagerTest <T extends TaskManager>{
                 3,
                 "Test Subtask",
                 "Test Subtask",
-                "PT300M",
+                300L,
                 "2023-07-23T10:00:00");
         taskManager.addSubtask(expectedSubtask);
         assertEquals(expectedSubtask.getStartTime().format(dateTimeFormatter), taskManager.getEpic(3).getStartTime().format(dateTimeFormatter), "Start time of epic don't update");
@@ -421,7 +527,7 @@ abstract class TaskManagerTest <T extends TaskManager>{
                 3,
                 "Test Subtask",
                 "Test Subtask",
-                "PT30M",
+                30L,
                 "2023-07-24T08:00:00");
         expectedSubtask.setId(6);
         taskManager.updateSubtask(expectedSubtask, "NEW");
