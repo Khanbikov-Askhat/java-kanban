@@ -1,3 +1,5 @@
+package manager;
+
 import manager.Managers;
 import manager.TaskManager;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,12 +22,12 @@ class InMemoryHistoryManagerTest {
         Task task1 = new Task(
                 "Task1",
                 "Task1",
-                "PT30M",
+                30L,
                 "2023-07-24T06:00:00");
         Task task2 = new Task(
                 "Task2",
                 "Task2",
-                "PT30M",
+                30L,
                 "2023-07-24T08:00:00");
         Epic epic1 = new Epic(
                 "Epic1",
@@ -33,7 +35,7 @@ class InMemoryHistoryManagerTest {
         Subtask subTask1 = new Subtask(
                 3, "SubTask1",
                 "SubTask1",
-                "PT30M",
+                30L,
                 "2023-07-24T10:00:00");
         manager.addTask(task1);
         manager.addTask(task2);
