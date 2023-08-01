@@ -22,12 +22,12 @@ class InMemoryHistoryManagerTest {
         Task task1 = new Task(
                 "Task1",
                 "Task1",
-                30L,
+                30,
                 "2023-07-24T06:00:00");
         Task task2 = new Task(
                 "Task2",
                 "Task2",
-                30L,
+                30,
                 "2023-07-24T08:00:00");
         Epic epic1 = new Epic(
                 "Epic1",
@@ -35,7 +35,7 @@ class InMemoryHistoryManagerTest {
         Subtask subTask1 = new Subtask(
                 3, "SubTask1",
                 "SubTask1",
-                30L,
+                30,
                 "2023-07-24T10:00:00");
         manager.addTask(task1);
         manager.addTask(task2);

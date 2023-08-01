@@ -27,13 +27,14 @@ public class Subtask extends Task {
         this.epicId = epicId;
     }
 
-    public Subtask(Integer epicId, String name, String description, Long durationMinutes, String startTime) {
+    public Subtask(Integer epicId, String name, String description, long durationMinutes, String startTime) {
         super(name, description, durationMinutes, startTime);
         this.epicId = epicId;
     }
 
-    public Subtask(int id, Integer epicId, String name, String description, Long durationMinutes, String startTime) {
+    public Subtask(int id, Integer epicId, String name, String description, long durationMinutes, String startTime) {
         super(name, description, durationMinutes, startTime);
+        this.id = id;
         this.epicId = epicId;
     }
 
@@ -69,7 +70,7 @@ public class Subtask extends Task {
                 Objects.equals(description, subtask.description) &&
                 Objects.equals(status, subtask.status) &&
                 subtask.startTime.isEqual(startTime) &&
-                subtask.duration.equals(duration);
+                subtask.duration == duration;
     }
 }
 

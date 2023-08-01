@@ -1,6 +1,5 @@
 package manager;
 
-import manager.TaskManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import task.Epic;
@@ -8,30 +7,31 @@ import task.Subtask;
 import task.Task;
 import task.TaskStatus;
 
+import java.io.IOException;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-abstract class TaskManagerTest <T extends TaskManager> {
+public abstract class TaskManagerTest <T extends TaskManager> {
 
-    private T taskManager;
+    protected T taskManager;
 
-    abstract T createTaskManager();
+    protected abstract T createTaskManager() throws IOException;
 
     @BeforeEach
-    public void setup() {
+    public void setup() throws IOException {
         taskManager = createTaskManager();
         Task task1 = new Task(
                 "Task1",
                 "Task1",
-                30L,
+                30,
                 "2023-07-24T06:00:00");
 
         Task task2 = new Task(
                 "Task2",
                 "Task2",
-                30L,
+                30,
                 "2023-07-24T14:00:00");
 
         Epic epic1 = new Epic(
@@ -49,25 +49,25 @@ abstract class TaskManagerTest <T extends TaskManager> {
         Subtask subtask1 = new Subtask(
                 3, "SubTask1",
                 "SubTask1",
-                30L,
+                30,
                 "2023-07-24T09:00:00");
 
         Subtask subtask2 = new Subtask(
                 3, "SubTask2",
                 "SubTask2",
-                30L,
+                30,
                 "2023-07-24T10:00:00");
 
         Subtask subtask3 = new Subtask(
                 4, "SubTask3",
                 "SubTask3",
-                30L,
+                30,
                 "2023-07-23T09:00:00");
 
         Subtask subtask4 = new Subtask(
                 4, "SubTask4",
                 "SubTask4",
-                30L,
+                30,
                 "2023-07-22T12:00:00");
 
         taskManager.addTask(task1);
@@ -96,7 +96,7 @@ abstract class TaskManagerTest <T extends TaskManager> {
         int epicId = taskManager.addEpic(epic);
         Subtask subtask = new Subtask(epicId, "Subtask #1-1",
                 "Subtask1 description",
-                30L,
+                30,
                 "2023-07-29T12:00:00");
         int subtaskId = taskManager.addSubtask(subtask);
         assertEquals(TaskStatus.NEW, taskManager.getEpic(epicId).getStatus());
@@ -108,7 +108,7 @@ abstract class TaskManagerTest <T extends TaskManager> {
         int epicId = taskManager.addEpic(epic);
         Subtask subtask1 = new Subtask(epicId, "Subtask #1-1",
                 "Subtask1 description",
-                30L,
+                30,
                 "2023-07-29T12:00:00");
         int subtaskId1 = taskManager.addSubtask(subtask1);
         taskManager.updateSubtask(subtask1, "DONE");
@@ -121,13 +121,13 @@ abstract class TaskManagerTest <T extends TaskManager> {
         int epicId = taskManager.addEpic(epic);
         Subtask subtask1 = new Subtask(epicId, "Subtask #1-1",
                 "Subtask1 description",
-                30L,
+                30,
                 "2023-07-28T12:00:00");
         int subtaskId1 = taskManager.addSubtask(subtask1);
         Subtask subtask2 = new Subtask(epicId,
                 "Subtask #2-1",
                 "Subtask2 description",
-                30L,
+                30,
                 "2023-07-29T12:00:00");
         int subtaskId2 = taskManager.addSubtask(subtask2);
         taskManager.updateSubtask(subtask1, "DONE");
@@ -140,13 +140,13 @@ abstract class TaskManagerTest <T extends TaskManager> {
         int epicId = taskManager.addEpic(epic);
         Subtask subtask1 = new Subtask(epicId, "Subtask #1-1",
                 "Subtask1 description",
-                30L,
+                30,
                 "2023-07-28T12:00:00");
         int subtaskId1 = taskManager.addSubtask(subtask1);
         Subtask subtask2 = new Subtask(epicId,
                 "Subtask #2-1",
                 "Subtask2 description",
-                30L,
+                30,
                 "2023-07-29T12:00:00");
         int subtaskId2 = taskManager.addSubtask(subtask2);
         taskManager.updateSubtask(subtask1, "IN_PROGRESS");
@@ -161,7 +161,7 @@ abstract class TaskManagerTest <T extends TaskManager> {
         Task expectedTask = new Task(
                 "Test Task",
                 "Test Task",
-                30L,
+                30,
                 "2023-07-25T12:00:00");
         taskManager.addTask(expectedTask);
         Task testedTask = taskManager.getTask(10);
@@ -184,7 +184,7 @@ abstract class TaskManagerTest <T extends TaskManager> {
                 3,
                 "Test Subtask",
                 "Test Subtask",
-                30L,
+                30,
                 "2023-07-24T07:00:00");
         taskManager.addSubtask(expectedSubtask);
         Subtask testedSubtask = taskManager.getSubtask(10);
@@ -198,7 +198,7 @@ abstract class TaskManagerTest <T extends TaskManager> {
                 10,
                 "New Subtask",
                 "New Subtask",
-                30L,
+                30,
                 "2023-07-24T07:00:00");
         taskManager.addSubtask(expectedSubtask);
         Subtask testedSubtask = taskManager.getSubtask(6);
@@ -319,7 +319,7 @@ abstract class TaskManagerTest <T extends TaskManager> {
         Task expectedTask = new Task(
                 "Updated Task",
                 "Updated Task",
-                30L,
+                30,
                 "2023-07-24T12:00:00");
         expectedTask.setId(1);
         taskManager.updateTask(expectedTask, "NEW");
@@ -344,7 +344,7 @@ abstract class TaskManagerTest <T extends TaskManager> {
                 3,
                 "Updated Subtask",
                 "Updated Subtask",
-                30L,
+                30,
                 "2023-07-24T07:00:00");
         expectedSubtask.setId(6);
         taskManager.updateSubtask(expectedSubtask, "NEW");
@@ -493,7 +493,7 @@ abstract class TaskManagerTest <T extends TaskManager> {
         Task expectedTask = new Task(
                 "Test Task",
                 "Test Task",
-                30L,
+                30,
                 "2023-07-21T12:00:00");
         taskManager.addTask(expectedTask);
         List<Task> afterAddNewTaskSortByPriorityTasks = taskManager.getPrioritizedTasks();
@@ -527,7 +527,7 @@ abstract class TaskManagerTest <T extends TaskManager> {
                 3,
                 "Test Subtask",
                 "Test Subtask",
-                30L,
+                30,
                 "2023-07-24T08:00:00");
         expectedSubtask.setId(6);
         taskManager.updateSubtask(expectedSubtask, "NEW");

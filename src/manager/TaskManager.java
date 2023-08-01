@@ -12,7 +12,7 @@ public interface TaskManager {
 
 
     //ДОБАВЛЕНИЕ НОВОГО ЭПИКА
-    int addEpic(Epic epic);
+    Integer addEpic(Epic epic);
 
 
     //ДОБАВЛЕНИЕ ПОДЗАДАЧИ
@@ -56,27 +56,27 @@ public interface TaskManager {
 
 
     //ОБНОВЛЕНИЕ ЗАДАЧИ
-    void updateTask(Task task, String newStatus);
+    boolean updateTask(Task task, String newStatus);
 
 
     //ОБНОВЛЕНИЕ ЭПИКА
-    void updateEpic(Epic epic);
+    boolean updateEpic(Epic epic);
 
 
     //ОБНОВЛЕНИЕ ПОДЗАДАЧИ
-    void updateSubtask(Subtask subtask, String newStatus);
+    boolean updateSubtask(Subtask subtask, String newStatus);
 
 
     //УДАЛЕНИЕ ЗАДАЧИ ПО ИНДЕНТИФИКАТОРУ
-    void deleteTask(int id);
+    boolean deleteTask(int id);
 
 
     //УДАЛЕНИЕ ЭПИКА ПО ИНДЕНТИФИКАТОРУ
-    void deleteEpic(int id);
+    boolean deleteEpic(int id);
 
 
     //УДАЛЕНИЕ ПОДЗАДАЧИ ПО ИНДЕНТИФИКАТОРУ
-    void deleteSubtask(int id);
+    boolean deleteSubtask(int id);
 
 
     //ПОЛУЧЕНИЕ ВСЕХ ПОДЗАДАЧ ОПРЕДЕЛЕННОГО ЭПИКА

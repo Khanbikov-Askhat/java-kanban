@@ -10,7 +10,7 @@ public class Task {
     protected String description;
     protected int id;
     protected TaskStatus status;
-    protected Long duration;
+    protected long duration;
     protected LocalDateTime startTime;
 
 
@@ -31,7 +31,18 @@ public class Task {
 
     }
 
-    public Task(String name, String description, Long durationMinutes, String startTime) {
+    public Task(int id, String name, String description, String startTime, long duration) {
+
+        this.name = name;
+        this.description = description;
+        this.id = id;
+        this.status = TaskStatus.NEW;
+        this.duration = duration;
+        this.startTime = LocalDateTime.parse(startTime);
+
+    }
+
+    public Task(String name, String description, long durationMinutes, String startTime) {
         if (name == null || description == null || startTime == null) {
             throw new TaskCreateException("Can't create Task");
         }
@@ -122,7 +133,7 @@ public class Task {
                 (id == task.id) &&
                 Objects.equals(status, task.status) &&
                 task.startTime.isEqual(startTime) &&
-                task.duration.equals(duration);
+                task.duration == duration;
     }
 
     @Override

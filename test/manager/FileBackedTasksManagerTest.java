@@ -13,14 +13,13 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class FileBackedTasksManagerTest extends TaskManagerTest<TaskManager> {
 
-    private TaskManager fileBackedTaskManager;
-    private File file;
+    public TaskManager fileBackedTaskManager;
+    public File file;
 
-    @Override
-    TaskManager createTaskManager() {
-        return Managers.getDefault();
+    //@Override
+    public TaskManager createTaskManager() {
+        return Managers.getDefaultFileBacked();
     }
-
 
 
     @BeforeEach
@@ -51,12 +50,12 @@ class FileBackedTasksManagerTest extends TaskManagerTest<TaskManager> {
         Task task1 = new Task(
                 "Task1",
                 "Task1",
-                30L,
+                30,
                 "2023-07-24T12:00:00");
         Task task2 = new Task(
                 "Task2",
                 "Task2",
-                30L,
+                30,
                 "2023-07-22T12:00:00");
         Epic epic1 = new Epic(
                 "Epic1",
@@ -79,12 +78,12 @@ class FileBackedTasksManagerTest extends TaskManagerTest<TaskManager> {
         Task task1 = new Task(
                 "Task1",
                 "Task1",
-                30L,
+                30,
                 "2023-07-24T12:00:00");
         Task task2 = new Task(
                 "Task2",
                 "Task2",
-                30L,
+                30,
                 "2023-07-22T12:00:00");
         Epic epic1 = new Epic(
                 "Epic1",
@@ -103,12 +102,12 @@ class FileBackedTasksManagerTest extends TaskManagerTest<TaskManager> {
         Task task1 = new Task(
                 "Task1",
                 "Task1",
-                30L,
+                30,
                 "2023-07-24T12:00:00");
         Task task2 = new Task(
                 "Task2",
                 "Task2",
-                30L,
+                30,
                 "2023-07-24T15:00:00");
         Epic epic1 = new Epic(
                 "Epic1",
@@ -117,13 +116,13 @@ class FileBackedTasksManagerTest extends TaskManagerTest<TaskManager> {
                 3,
                 "Subtask1",
                 "Subtask1",
-                30L,
+                30,
                 "2023-07-24T07:00:00");
         Subtask subTask2 = new Subtask(
                 3,
                 "Subtask2",
                 "Subtask2",
-                30L,
+                30,
                 "2023-07-24T09:00:00");
         fileBackedTaskManager.addTask(task1);
         fileBackedTaskManager.addTask(task2);
@@ -147,12 +146,12 @@ class FileBackedTasksManagerTest extends TaskManagerTest<TaskManager> {
         Task task1 = new Task(
                 "Task1",
                 "Task1",
-                30L,
+                30,
                 "2023-07-24T12:00:00");
         Task task2 = new Task(
                 "Task2",
                 "Task2",
-                30L,
+                30,
                 "2023-07-22T12:00:00");
         Epic epic1 = new Epic(
                 "Epic1",
@@ -172,7 +171,7 @@ class FileBackedTasksManagerTest extends TaskManagerTest<TaskManager> {
         Task task1 = new Task(
                 "Task1",
                 "Task1",
-                30L,
+                30,
                 "2023-07-24T12:00:00");
         FileBackedTasksManager newBackedTaskManager = new FileBackedTasksManager(new File(""));
         Exception exception = assertThrows(ManagerSaveException.class, () -> newBackedTaskManager.addTask(task1));

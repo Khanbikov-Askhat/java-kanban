@@ -12,12 +12,14 @@ import java.util.Map;
 
 public class FileBackedTasksManager extends InMemoryTaskManager {
 
-    private final File file;
+    private File file;
 
     public FileBackedTasksManager(File file) {
         this.file = file;
     }
 
+    public FileBackedTasksManager() {
+    }
 
     //СОХРАНЕНИЕ ФАЙЛА
     protected void save() {
@@ -63,7 +65,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
     }
 
     @Override
-    public int addEpic(Epic epic) {
+    public Integer addEpic(Epic epic) {
         super.addEpic(epic);
         save();
         return epic.getId();
