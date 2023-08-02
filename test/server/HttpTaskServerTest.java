@@ -121,7 +121,7 @@ public class HttpTaskServerTest {
     }
 
     @Test
-    void shouldRemoveAllTasks() {
+    void shouldDeleteAllTasks() {
         URI url = URI.create("http://localhost:8080/tasks/task/");
         HttpRequest request = HttpRequest.newBuilder().uri(url).DELETE().build();
         int expectedSize = 0;
@@ -221,7 +221,7 @@ public class HttpTaskServerTest {
     }
 
     @Test
-    void shouldRemoveTaskWithId1() {
+    void shouldDeleteTaskWithId1() {
         URI url = URI.create("http://localhost:8080/tasks/task/?id=1");
         HttpRequest request = HttpRequest.newBuilder().uri(url).DELETE().build();
         String responseBody = getBodyResponse(request);
@@ -230,7 +230,7 @@ public class HttpTaskServerTest {
     }
 
     @Test
-    void shouldNotRemoveTaskWithId3() {
+    void shouldNotDeleteTaskWithId3() {
         URI url = URI.create("http://localhost:8080/tasks/task/?id=3");
         HttpRequest request = HttpRequest.newBuilder().uri(url).DELETE().build();
         String responseBody = getBodyResponse(request);
@@ -253,7 +253,7 @@ public class HttpTaskServerTest {
     }
 
     @Test
-    void shouldRemoveAllEpics() {
+    void shouldDeleteAllEpics() {
         URI url = URI.create("http://localhost:8080/tasks/epic/");
         HttpRequest request = HttpRequest.newBuilder().uri(url).DELETE().build();
         int expectedSize = 0;
@@ -316,7 +316,7 @@ public class HttpTaskServerTest {
     }
 
     @Test
-    void shouldRemoveEpicWithId3() {
+    void shouldDeleteEpicWithId3() {
         URI url = URI.create("http://localhost:8080/tasks/epic/?id=3");
         HttpRequest request = HttpRequest.newBuilder().uri(url).DELETE().build();
         String responseBody = getBodyResponse(request);
@@ -325,7 +325,7 @@ public class HttpTaskServerTest {
     }
 
     @Test
-    void shouldNotRemoveEpicWithId1() {
+    void shouldNotDeleteEpicWithId1() {
         URI url = URI.create("http://localhost:8080/tasks/epic/?id=1");
         HttpRequest request = HttpRequest.newBuilder().uri(url).DELETE().build();
         String responseBody = getBodyResponse(request);
@@ -381,7 +381,7 @@ public class HttpTaskServerTest {
     }
 
     @Test
-    void shouldRemoveAllSubtasks() {
+    void shouldDeleteAllSubtasks() {
         URI url = URI.create("http://localhost:8080/tasks/subtask/");
         HttpRequest request = HttpRequest.newBuilder().uri(url).DELETE().build();
         int expectedSize = 0;
@@ -477,7 +477,7 @@ public class HttpTaskServerTest {
     }
 
     @Test
-    void shouldRemoveSubtaskWithId6() {
+    void shouldDeleteSubtaskWithId6() {
         URI url = URI.create("http://localhost:8080/tasks/subtask/?id=6");
         HttpRequest request = HttpRequest.newBuilder().uri(url).DELETE().build();
         String responseBody = getBodyResponse(request);
@@ -486,7 +486,7 @@ public class HttpTaskServerTest {
     }
 
     @Test
-    void shouldNotRemoveSubtaskWithId1() {
+    void shouldNotDeleteSubtaskWithId1() {
         URI url = URI.create("http://localhost:8080/tasks/subtask/?id=1");
         HttpRequest request = HttpRequest.newBuilder().uri(url).DELETE().build();
         String responseBody = getBodyResponse(request);

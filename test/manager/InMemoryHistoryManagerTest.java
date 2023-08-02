@@ -64,7 +64,7 @@ class InMemoryHistoryManagerTest {
     }
     //УДАЛЕНИЕ ИЗ НАЧАЛА
     @Test
-    void shouldRemoveFromBegin() {
+    void shouldDeleteFromBegin() {
         manager.getTask(1);
         manager.getTask(2);
         manager.getEpic(3);
@@ -76,7 +76,7 @@ class InMemoryHistoryManagerTest {
     }
     //УДАЛЕНИЕ ИЗ СЕРЕДИНЫ
     @Test
-    void shouldRemoveFromMiddle() {
+    void shouldDeleteFromMiddle() {
         manager.getTask(1);
         manager.getTask(2);
         manager.getEpic(3);
@@ -88,7 +88,7 @@ class InMemoryHistoryManagerTest {
     }
     //УДАЛЕНИЕ ИЗ КОНЦА
     @Test
-    void shouldRemoveFromEnd() {
+    void shouldDeleteFromEnd() {
         manager.getTask(1);
         manager.getTask(2);
         manager.getEpic(3);
