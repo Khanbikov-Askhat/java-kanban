@@ -1,4 +1,5 @@
 package manager;
+import exceptions.TaskOverlapAnotherTaskException;
 import exceptions.TaskValidationException;
 import task.Epic;
 import task.Subtask;
@@ -31,6 +32,9 @@ public class InMemoryTaskManager implements TaskManager {
     //ДОБАВЛЕНИЕ НОВОГО ТАСКА
     @Override
     public Integer addTask(Task task) {
+        if (isTaskOverlapAnotherTask(task)) {
+            return null;
+        }
         int id = ++generatorId;
 
         task.setId(id);
@@ -43,6 +47,9 @@ public class InMemoryTaskManager implements TaskManager {
     //ДОБАВЛЕНИЕ НОВОГО ЭПИКА
     @Override
     public Integer addEpic(Epic epic) {
+        if (epic == null || epics.containsKey(epic.getId())) {
+            return null;
+        }
         int id = ++generatorId;
 
         epic.setId(id);
@@ -54,6 +61,9 @@ public class InMemoryTaskManager implements TaskManager {
     //ДОБАВЛЕНИЕ ПОДЗАДАЧИ
     @Override
     public Integer addSubtask(Subtask subtask) {
+        if (isTaskOverlapAnotherTask(subtask)) {
+            return null;
+        }
         int epicId = subtask.getEpicId();
         Epic epic = epics.get(epicId);
 
@@ -364,5 +374,22 @@ public class InMemoryTaskManager implements TaskManager {
             throw new TaskValidationException("Задача пересекаются с id=" + t.getId() + " c " + existStart + " по " + existEnd);
         }
         prioritizedTasks.add(task);
+    }
+
+    public boolean isTaskOverlapAnotherTask(Task task) {
+        final LocalDateTime startTime = task.getStartTime();
+        final LocalDateTime endTime = task.getEndTime();
+        for (Task t : prioritizedTasks) {
+            final LocalDateTime existStart = t.getStartTime();
+            final LocalDateTime existEnd = t.getEndTime();
+            if (!endTime.isAfter(existStart)) {
+                continue;
+            }
+            if (!existEnd.isAfter(startTime)) {
+                continue;
+            }
+            throw new TaskOverlapAnotherTaskException("Задача пересекаются с id=" + t.getId() + " c " + existStart + " по " + existEnd);
+        }
+        return false;
     }
 }

@@ -4,8 +4,8 @@ import java.io.File;
 
 public final class Managers {
 
-    public static TaskManager getDefault() {
-        return new HttpTaskManager();
+    public static TaskManager getDefault(String url, int port, String key) {
+        return new HttpTaskManager(url, port, key);
     }
 
     public static TaskManager getDefaultFileBacked() {

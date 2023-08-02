@@ -12,7 +12,7 @@ import java.util.Map;
 
 public class FileBackedTasksManager extends InMemoryTaskManager {
 
-    private File file;
+    protected File file;
 
     public FileBackedTasksManager(File file) {
         this.file = file;
@@ -31,12 +31,12 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
                 writer.write(CSVTaskFormat.toString(task));
                 writer.newLine();
             }
-            for (Map.Entry<Integer, Subtask> entry : subtasks.entrySet()) {
+            for (Map.Entry<Integer, Epic> entry : epics.entrySet()) {
                 final Task task = entry.getValue();
                 writer.write(CSVTaskFormat.toString(task));
                 writer.newLine();
             }
-            for (Map.Entry<Integer, Epic> entry : epics.entrySet()) {
+            for (Map.Entry<Integer, Subtask> entry : subtasks.entrySet()) {
                 final Task task = entry.getValue();
                 writer.write(CSVTaskFormat.toString(task));
                 writer.newLine();
@@ -141,6 +141,11 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         save();
     }
 
+    @Override
+    public List<Task> getDefaultHistory() {
+        return super.getDefaultHistory();
+    }
+
 
     public static FileBackedTasksManager loadFromFile(File file) {
         final FileBackedTasksManager taskManager = new FileBackedTasksManager(file);
@@ -213,6 +218,5 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
                 && subtasks.equals(fileBackedTasksManager.subtasks)
                 && historyManager.equals(fileBackedTasksManager.historyManager);
     }
-
 }
 

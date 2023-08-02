@@ -10,8 +10,6 @@ import com.google.gson.*;
 import adapters.LocalDateTimeAdapter;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import manager.HttpTaskManager;
-import manager.Managers;
 import server.exception.ResponseException;
 import task.Epic;
 import task.Subtask;
@@ -28,78 +26,96 @@ import java.util.List;
 
 public class HttpTaskServerTest {
 
+    private static final int PORT = 8078;
     private HttpTaskServer httpTaskServer;
-    private HttpTaskManager manager;
     private Gson gson;
+    private HttpClient client;
     private KVServer server;
-    private Task task1;
-    private Epic epic1;
-    private Subtask subtask1;
 
     @BeforeEach
-    public void setup() throws IOException {
-        server = new KVServer();
+    public void setup() throws IOException, InterruptedException {
+        server = new KVServer(PORT);
         server.start();
-        manager = (HttpTaskManager) Managers.getDefault();
-        httpTaskServer = new HttpTaskServer(manager);
 
-        manager.deleteTasks();
-        manager.deleteEpics();
-        manager.deleteTasks();
-
-        task1 = new Task(
+        Task task1 = new Task(
                 "Task1",
                 "Task1",
                 30,
-                "2022-08-30T06:00:00");
+                "2023-07-30T06:00:00");
         Task task2 = new Task(
                 "Task2",
                 "Task2",
                 30,
-                "2022-09-30T06:00:00");
+                "2023-07-30T14:00:00");
 
-        epic1 = new Epic(
+        Epic epic1 = new Epic(
                 "Epic1",
                 "Epic1");
+        Epic epic2 = new Epic(
+                "Epic2",
+                "Epic2");
+        Epic epic3 = new Epic(
+                "Epic3",
+                "Epic3");
 
-        subtask1 = new Subtask(
-                2,
-                "SubTask1",
-                "SubTask1",
+        Subtask subtask1 = new Subtask(
+                3,
+                "Subtask1",
+                "Subtask1",
                 30,
-                "2022-08-30T09:00:00");
+                "2023-07-30T09:00:00");
+        Subtask subtask2 = new Subtask(
+                3,
+                "Subtask2",
+                "Subtask2",
+                30,
+                "2023-07-30T10:00:00");
+        Subtask subtask3 = new Subtask(
+                4,
+                "Subtask3",
+                "Subtask3",
+                30,
+                "2023-07-29T09:00:00");
+        Subtask subtask4 = new Subtask(
+                4,
+                "Subtask4",
+                "Subtask4",
+                30,
+                "2023-07-28T12:00:00");
 
-        int taskId1 = manager.addTask(task1);
-        int taskId2 = manager.addTask(task2);
-        int epicId = manager.addEpic(epic1);
-        int subtaskId = manager.addSubtask(subtask1);
-        manager.getTask(taskId1);
-        manager.getTask(taskId2);
-        manager.getEpic(epicId);
-        manager.getSubtask(subtaskId);
+        httpTaskServer = new HttpTaskServer();
         httpTaskServer.start();
         gson = new GsonBuilder().
-                registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
-                .create();
+                registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter()).
+                setPrettyPrinting().create();
+        client = HttpClient.newHttpClient();
+        createTask(task1);
+        createTask(task2);
+        createEpic(epic1);
+        createEpic(epic2);
+        createEpic(epic3);
+        createSubTask(subtask1);
+        createSubTask(subtask2);
+        createSubTask(subtask3);
+        createSubTask(subtask4);
     }
 
     @AfterEach
     public void after() {
-        server.stop();
         httpTaskServer.stop();
+        server.stop();
     }
 
     @Test
-    void shouldReturnListOfTasksWithSize1() {
+    void shouldReturnListOfTasksWithSize2() {
         URI url = URI.create("http://localhost:8080/tasks/task/");
         HttpRequest request = HttpRequest.newBuilder().uri(url).GET().build();
-        int expectedSize = 1;
+        int expectedSize = 2;
         String body = getBodyResponse(request);
         JsonElement jsonElement = JsonParser.parseString(body);
-        //assertTrue(jsonElement.isJsonObject(), "Wrong answer from server");
-        //JsonObject jsonObject = jsonElement.getAsJsonObject();
-        //JsonArray jsonArray = jsonElement.getAsJsonArray(String.valueOf(TASKS));
-        JsonArray jsonArray = jsonElement.getAsJsonArray();
+        assertTrue(jsonElement.isJsonObject(), "Wrong answer from server");
+        JsonObject jsonObject = jsonElement.getAsJsonObject();
+        JsonArray jsonArray = jsonObject.getAsJsonArray(String.valueOf(TASKS));
         assertNotNull(jsonArray, "Tasks don't return");
         assertEquals(expectedSize, jsonArray.size(), "Wrong tasks size");
     }
@@ -115,25 +131,23 @@ public class HttpTaskServerTest {
     }
 
     @Test
-    void shouldReturnTaskWithId1() throws IOException, InterruptedException {
-        HttpClient client = HttpClient.newHttpClient();
-        HttpResponse<String> response;
-        URI url = URI.create("http://localhost:8080/tasks/task?id=1");
-        HttpRequest httpRequest = HttpRequest.newBuilder().uri(url).GET().build();
-        response = client.send(httpRequest, HttpResponse.BodyHandlers.ofString());
-        assertEquals(200, response.statusCode());
-        assertEquals(manager.getTasks().get(0), task1, "Неверная задача.");
+    void shouldReturnTaskWithId1() {
+        URI url = URI.create("http://localhost:8080/tasks/task/?id=1");
+        HttpRequest request = HttpRequest.newBuilder().uri(url).GET().build();
+        int expectedId = 1;
+        String body = getBodyResponse(request);
+        JsonElement jsonElement = JsonParser.parseString(body);
+        assertTrue(jsonElement.isJsonObject(), "Wrong answer from server");
+        JsonObject jsonObject = jsonElement.getAsJsonObject();
+        int testId = jsonObject.get("id").getAsInt();
+        assertEquals(expectedId, testId, "Wrong task");
     }
 
     @Test
-    void shouldNotReturnTaskWithId5() throws IOException, InterruptedException {
-        HttpClient client = HttpClient.newHttpClient();
-        HttpResponse<String> response;
+    void shouldNotReturnTaskWithId5() {
         URI url = URI.create("http://localhost:8080/tasks/task/?id=5");
         HttpRequest request = HttpRequest.newBuilder().uri(url).GET().build();
-        response = client.send(request, HttpResponse.BodyHandlers.ofString());
         String expected = TASK.name() + " " + NOT_FOUND;
-        assertEquals(200, response.statusCode());
         String responseBody = getBodyResponse(request);
         assertEquals(expected, responseBody, "Task found");
     }
@@ -144,7 +158,7 @@ public class HttpTaskServerTest {
                 "New Task",
                 "New Task",
                 30,
-                "2022-08-24T06:00:00");
+                "2023-07-24T06:00:00");
         URI url = URI.create("http://localhost:8080/tasks/task");
         String json = gson.toJson(newTask);
         final HttpRequest.BodyPublisher body = HttpRequest.BodyPublishers.ofString(json);
@@ -160,13 +174,13 @@ public class HttpTaskServerTest {
                 "Task1",
                 "Task1",
                 30,
-                "2022-08-30T06:00:00");
+                "2023-07-30T06:00:00");
         newTask.setId(1);
         URI url = URI.create("http://localhost:8080/tasks/task");
         String json = gson.toJson(newTask);
         final HttpRequest.BodyPublisher body = HttpRequest.BodyPublishers.ofString(json);
         HttpRequest request = HttpRequest.newBuilder().uri(url).POST(body).build();
-        String expected = TASK.name() + " " + ALREADY_EXISTS;
+        String expected = TASK.name() + " " + OVERLAP_BY_TIME;
         String responseBody = getBodyResponse(request);
         assertEquals(expected, responseBody, "Task created");
     }
@@ -177,9 +191,9 @@ public class HttpTaskServerTest {
                 "Updated Task",
                 "Updated Task",
                 30,
-                "2022-08-30T12:00:00");
-        newTask.setId(1);
-        URI url = URI.create("http://localhost:8080/tasks/task");
+                "2023-07-30T12:00:00");
+        //newTask.setId(1);
+        URI url = URI.create("http://localhost:8080/tasks/task?id=1");
         String json = gson.toJson(newTask);
         final HttpRequest.BodyPublisher body = HttpRequest.BodyPublishers.ofString(json);
         HttpRequest request = HttpRequest.newBuilder().uri(url).POST(body).build();
@@ -193,14 +207,15 @@ public class HttpTaskServerTest {
         URI url = URI.create("http://localhost:8080/tasks/task");
         final HttpRequest.BodyPublisher body = HttpRequest.BodyPublishers.ofString("""
                 {
-                  "name": "Updated Task",
-                  "description": "Updated Task",
+                  "name": "Task1",
+                  "description": "Task1",
                   "id": 1,
                   "state": "NEW",
-                  "startTime": "2022-08-28T12:00"
+                  "startTime": "2023-07-30T06:00:00",
+                  "duration": "30"
                 }""");
         HttpRequest request = HttpRequest.newBuilder().uri(url).POST(body).build();
-        String expected = TASK.name() + " " + HAS_NULL_FIELDS;
+        String expected = TASK.name() + " " + OVERLAP_BY_TIME;
         String responseBody = getBodyResponse(request);
         assertEquals(expected, responseBody, "Task updated");
     }
@@ -282,48 +297,16 @@ public class HttpTaskServerTest {
     }
 
     @Test
-    void shouldNotAddSameEpic() {
-        Epic newEpic = new Epic("Epic1", "Epic1");
-        newEpic.setId(3);
-        URI url = URI.create("http://localhost:8080/tasks/epic");
-        String json = gson.toJson(newEpic);
-        final HttpRequest.BodyPublisher body = HttpRequest.BodyPublishers.ofString(json);
-        HttpRequest request = HttpRequest.newBuilder().uri(url).POST(body).build();
-        String expected = EPIC.name() + " " + ALREADY_EXISTS;
-        String responseBody = getBodyResponse(request);
-        assertEquals(expected, responseBody, "Epic created");
-    }
-
-    @Test
-    void shouldNotAddSameSubTask() {
-        Subtask newSubTask = new Subtask(
-                3,
-                "SubTask1",
-                "SubTask1",
-                30,
-                "2022-08-30T09:00:00");
-        newSubTask.setId(6);
-        URI url = URI.create("http://localhost:8080/tasks/subtask");
-        String json = gson.toJson(newSubTask);
-        final HttpRequest.BodyPublisher body = HttpRequest.BodyPublishers.ofString(json);
-        HttpRequest request = HttpRequest.newBuilder().uri(url).POST(body).build();
-        String expected = SUBTASK.name() + " " + ALREADY_EXISTS;
-        String responseBody = getBodyResponse(request);
-        assertEquals(expected, responseBody, "Subtask created");
-    }
-
-    @Test
     void shouldUpdateEpic() {
         List<Integer> subTasksIds = List.of(6, 7);
         Epic newEpic = new Epic(
                 "Updated Task",
                 "Updated Task");
-        newEpic.setId(3);
-        newEpic.setStartTime(LocalDateTime.parse("2022-08-30T09:00:00"));
-        newEpic.setDuration(60L);
+        newEpic.setStartTime(LocalDateTime.parse("2023-07-30T09:00:00"));
+        newEpic.setDuration(60);
         newEpic.setEndTime(LocalDateTime.parse("2022-08-30T10:30:00"));
         newEpic.setSubtasksIds(subTasksIds);
-        URI url = URI.create("http://localhost:8080/tasks/epic");
+        URI url = URI.create("http://localhost:8080/tasks/epic?id=3");
         String json = gson.toJson(newEpic);
         final HttpRequest.BodyPublisher body = HttpRequest.BodyPublishers.ofString(json);
         HttpRequest request = HttpRequest.newBuilder().uri(url).POST(body).build();
@@ -333,26 +316,7 @@ public class HttpTaskServerTest {
     }
 
     @Test
-    void shouldNotUpdateEpic() {
-        URI url = URI.create("http://localhost:8080/tasks/epic");
-        final HttpRequest.BodyPublisher body = HttpRequest.BodyPublishers.ofString("""
-                {
-                      "endTime": "2022-08-30T10:30",
-                      "name": "Epic1",
-                      "description": "Epic1",
-                      "id": 3,
-                      "state": "NEW",
-                      "duration": "PT1H",
-                      "startTime": "2022-08-30T09:00"
-                    }""");
-        HttpRequest request = HttpRequest.newBuilder().uri(url).POST(body).build();
-        String expected = EPIC.name() + " " + HAS_NULL_FIELDS;
-        String responseBody = getBodyResponse(request);
-        assertEquals(expected, responseBody, "Epic updated");
-    }
-
-    @Test
-    void shouldDeleteEpicWithId3() {
+    void shouldRemoveEpicWithId3() {
         URI url = URI.create("http://localhost:8080/tasks/epic/?id=3");
         HttpRequest request = HttpRequest.newBuilder().uri(url).DELETE().build();
         String responseBody = getBodyResponse(request);
@@ -451,9 +415,11 @@ public class HttpTaskServerTest {
     @Test
     void shouldAddNewSubtask() {
         Subtask newSubTask = new Subtask(
+                3,
                 "NewSubTask",
                 "NewSubTask",
-                3);
+                30,
+                "2023-08-01T09:00:00");
         URI url = URI.create("http://localhost:8080/tasks/subtask");
         String json = gson.toJson(newSubTask);
         final HttpRequest.BodyPublisher body = HttpRequest.BodyPublishers.ofString(json);
@@ -466,11 +432,12 @@ public class HttpTaskServerTest {
     @Test
     void shouldUpdateSubtask() {
         Subtask newSubtask = new Subtask(
+                3,
                 "Updated SubTask",
                 "Updated SubTask",
-                3);
-        newSubtask.setId(6);
-        URI url = URI.create("http://localhost:8080/tasks/subtask");
+                30,
+                "2023-07-30T09:00:00");
+        URI url = URI.create("http://localhost:8080/tasks/subtask?id=6");
         String json = gson.toJson(newSubtask);
         final HttpRequest.BodyPublisher body = HttpRequest.BodyPublishers.ofString(json);
         HttpRequest request = HttpRequest.newBuilder().uri(url).POST(body).build();
@@ -481,12 +448,11 @@ public class HttpTaskServerTest {
 
     @Test
     void shouldNotUpdateSubtask() {
-        URI url = URI.create("http://localhost:8080/tasks/subtask");
+        URI url = URI.create("http://localhost:8080/tasks/subtask?id=6");
         final HttpRequest.BodyPublisher body = HttpRequest.BodyPublishers.ofString("""
                 {
                       "name": "SubTask1",
                       "description": "SubTask1",
-                      "id": 6,
                       "state": "NEW",
                       "duration": 30,
                       "startTime": "2022-08-30T09:00"
@@ -597,11 +563,12 @@ public class HttpTaskServerTest {
 
     @Test
     void shouldReturnTaskWrongMethod() {
-        Subtask newSubtask = new Subtask(
-                "Updated SubTask",
-                "Updated SubTask",
-                3);
-        String json = gson.toJson(newSubtask);
+        Task newTask = new Task(
+                "Updated Task",
+                "Updated Task",
+                30,
+                "2023-07-30T12:00:00");
+        String json = gson.toJson(newTask);
         final HttpRequest.BodyPublisher body = HttpRequest.BodyPublishers.ofString(json);
         URI url = URI.create("http://localhost:8080/tasks/task");
         HttpRequest request = HttpRequest.newBuilder().uri(url).PUT(body).build();
@@ -613,9 +580,11 @@ public class HttpTaskServerTest {
     @Test
     void shouldReturnSubTaskWrongMethod() {
         Subtask newSubtask = new Subtask(
+                3,
                 "Updated SubTask",
                 "Updated SubTask",
-                3);
+                30,
+                "2023-07-30T09:00:00");
         String json = gson.toJson(newSubtask);
         final HttpRequest.BodyPublisher body = HttpRequest.BodyPublishers.ofString(json);
         URI url = URI.create("http://localhost:8080/tasks/subtask");
@@ -627,11 +596,10 @@ public class HttpTaskServerTest {
 
     @Test
     void shouldReturnEpicWrongMethod() {
-        Subtask newSubtask = new Subtask(
-                "Updated SubTask",
-                "Updated SubTask",
-                3);
-        String json = gson.toJson(newSubtask);
+        Epic newEpic = new Epic(
+                "new Epic",
+                "new Epic");
+        String json = gson.toJson(newEpic);
         final HttpRequest.BodyPublisher body = HttpRequest.BodyPublishers.ofString(json);
         URI url = URI.create("http://localhost:8080/tasks/epic");
         HttpRequest request = HttpRequest.newBuilder().uri(url).PUT(body).build();
@@ -664,7 +632,7 @@ public class HttpTaskServerTest {
                 "TestTask",
                 "TestTask",
                 30,
-                "2022-08-30T06:00:00");
+                "2023-07-30T06:20:00");
         URI url = URI.create("http://localhost:8080/tasks/task");
         String json = gson.toJson(newTask);
         final HttpRequest.BodyPublisher body = HttpRequest.BodyPublishers.ofString(json);
@@ -681,7 +649,7 @@ public class HttpTaskServerTest {
                 "TestSubTask",
                 "TestSubTask",
                 30,
-                "2022-08-30T06:00:00");
+                "2023-07-30T06:00:00");
         URI url = URI.create("http://localhost:8080/tasks/subtask");
         String json = gson.toJson(subTask);
         final HttpRequest.BodyPublisher body = HttpRequest.BodyPublishers.ofString(json);
@@ -700,7 +668,6 @@ public class HttpTaskServerTest {
     }
 
     public String getBodyResponse(HttpRequest httpRequest) {
-        HttpClient client = HttpClient.newHttpClient();
         HttpResponse<String> response;
         try {
             response = client.send(httpRequest, HttpResponse.BodyHandlers.ofString());
@@ -709,6 +676,30 @@ public class HttpTaskServerTest {
             throw new ResponseException("No response from server");
         }
         return response.body();
+    }
+
+    public void createTask(Task newTask) throws IOException, InterruptedException {
+        URI url = URI.create("http://localhost:8080/tasks/task");
+        String json = gson.toJson(newTask);
+        final HttpRequest.BodyPublisher body = HttpRequest.BodyPublishers.ofString(json);
+        HttpRequest request = HttpRequest.newBuilder().uri(url).POST(body).build();
+        client.send(request, HttpResponse.BodyHandlers.ofString());
+    }
+
+    public void createEpic(Epic newEpic) throws IOException, InterruptedException {
+        URI url = URI.create("http://localhost:8080/tasks/epic/");
+        String json = gson.toJson(newEpic);
+        final HttpRequest.BodyPublisher body = HttpRequest.BodyPublishers.ofString(json);
+        HttpRequest request = HttpRequest.newBuilder().uri(url).POST(body).build();
+        client.send(request, HttpResponse.BodyHandlers.ofString());
+    }
+
+    public void createSubTask(Subtask subtask) throws IOException, InterruptedException {
+        URI url = URI.create("http://localhost:8080/tasks/subtask/");
+        String json = gson.toJson(subtask);
+        final HttpRequest.BodyPublisher body = HttpRequest.BodyPublishers.ofString(json);
+        HttpRequest request = HttpRequest.newBuilder().uri(url).POST(body).build();
+        client.send(request, HttpResponse.BodyHandlers.ofString());
     }
 
 }

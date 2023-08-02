@@ -1,5 +1,7 @@
 package task;
 
+import exceptions.TaskCreateException;
+
 import java.util.Objects;
 
 public class Subtask extends Task {
@@ -22,18 +24,27 @@ public class Subtask extends Task {
         this.epicId = Integer.parseInt(subTask[5]);
     }
 
-    public Subtask(int id, String name, String description, TaskStatus status, int epicId) {
+    public Subtask(int id, String name, String description, TaskStatus status, Integer epicId) {
         super(id, name, description, status);
+        if (name == null || description == null || epicId == null || epicId == 0) {
+            throw new TaskCreateException("Can't create Subtask");
+        }
         this.epicId = epicId;
     }
 
     public Subtask(Integer epicId, String name, String description, long durationMinutes, String startTime) {
         super(name, description, durationMinutes, startTime);
+        if (name == null || description == null || startTime == null || epicId == null || epicId == 0) {
+            throw new TaskCreateException("Can't create Subtask");
+        }
         this.epicId = epicId;
     }
 
     public Subtask(int id, Integer epicId, String name, String description, long durationMinutes, String startTime) {
         super(name, description, durationMinutes, startTime);
+        if (name == null || description == null || startTime == null || epicId == null || epicId == 0) {
+            throw new TaskCreateException("Can't create Subtask");
+        }
         this.id = id;
         this.epicId = epicId;
     }

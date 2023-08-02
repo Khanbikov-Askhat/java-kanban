@@ -23,7 +23,9 @@ public class Task {
     }
 
     public Task(String name, String description, int id) {
-
+        if (name == null || description == null) {
+            throw new TaskCreateException("Can't create Task");
+        }
         this.name = name;
         this.description = description;
         this.id = id;
@@ -32,7 +34,9 @@ public class Task {
     }
 
     public Task(int id, String name, String description, String startTime, long duration) {
-
+        if (name == null || description == null || startTime == null ) {
+            throw new TaskCreateException("Can't create Task");
+        }
         this.name = name;
         this.description = description;
         this.id = id;
@@ -43,7 +47,7 @@ public class Task {
     }
 
     public Task(String name, String description, long durationMinutes, String startTime) {
-        if (name == null || description == null || startTime == null) {
+        if (name == null || description == null || startTime == null ) {
             throw new TaskCreateException("Can't create Task");
         }
         this.name = name;
@@ -162,11 +166,11 @@ public class Task {
         return startTime;
     }
 
-    public void setDuration(Long duration) {
+    public void setDuration(long duration) {
         this.duration = duration;
     }
 
-    public Long getDuration() {
+    public long getDuration() {
         return duration;
     }
 

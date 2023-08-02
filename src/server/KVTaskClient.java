@@ -1,7 +1,7 @@
 package server;
 
-import exceptions.NotCorrectRequestException;
-
+import exceptions.*;
+import org.junit.platform.commons.util.StringUtils;
 
 import java.io.IOException;
 import java.net.URI;
@@ -9,49 +9,75 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-
 public class KVTaskClient {
-    private final String url = "http://localhost:8078";
-    private final HttpClient httpClient = HttpClient.newHttpClient(); // Финализировала, инкапсулировала
-    private String apiToken; // Токен, который нужен при работе с сервером
+    private final String apiToken;
+    private final String url;
+    private final int port;
 
-    public KVTaskClient() { // Cоздаем экземпляр KVTaskClient
-        URI uri = URI.create(url + "/register");
-        HttpRequest request = HttpRequest.newBuilder().uri(uri).GET().build();
+    public KVTaskClient(String url, int port) {
+        this.port = port;
+        this.url = url;
+        URI register = URI.create(url + port + "/register");
+        HttpRequest request = HttpRequest.newBuilder()
+                .GET()
+                .uri(register)
+                .header("Content-Type", "application/json")
+                .build();
+
+        HttpClient client = HttpClient.newHttpClient();
+        HttpResponse.BodyHandler<String> handler = HttpResponse.BodyHandlers.ofString();
+        HttpResponse<String> response;
         try {
-            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-            if (response.statusCode() == 200) {
-                apiToken = response.body();
-            }
-            System.out.println("Не удалось получить данные API_TOKEN.");
-        } catch (IOException | InterruptedException e) { // обрабатываем ошибки отправки запроса
-            System.out.println("Во время выполнения запроса ресурса по URL-адресу: '" + url + "', возникла ошибка.\n" + "Проверьте, пожалуйста, адрес и повторите попытку.");
+            response = client.send(request, handler);
+        } catch (IOException | InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new TaskClientRegisterException("Can't register " + e.getMessage());
+        }
+        apiToken = response.body();
+    }
+
+    public void put(String key, String json) {
+        URI save = URI.create(url + port + "/save/" + key + "?API_TOKEN=" + apiToken);
+        HttpRequest request = HttpRequest.newBuilder()
+                .POST(HttpRequest.BodyPublishers.ofString(json))
+                .uri(save)
+                .header("Content-Type", "application/json")
+                .build();
+
+        HttpClient client = HttpClient.newHttpClient();
+        HttpResponse.BodyHandler<String> handler = HttpResponse.BodyHandlers.ofString();
+        HttpResponse<String> response;
+        try {
+            response = client.send(request, handler);
+        } catch (IOException | InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new ManagerServerSaveException("Can't save to server" + e.getMessage());
+        }
+        if (StringUtils.isBlank(String.valueOf(response)) || response.statusCode() != 200) {
+            throw new ManagerServerSaveException("Can't save to server");
         }
     }
 
-    public void put(String key, String json) { // Метод должен сохранять состояние менеджера задач через запрос POST /save/<ключ>?API_TOKEN=
-        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(url + "/save" + key + "?API_TOKEN=" + apiToken)).POST(HttpRequest.BodyPublishers.ofString(json)).build();
-        try {
-            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString(UTF_8));
-            if (response.statusCode() != 200) {
-                throw new NotCorrectRequestException("Произошла ошибка при загрузке с сервера. Код ошибки: " + response.statusCode());
-            }
-        } catch (IOException | InterruptedException e) { // обрабатываем ошибки отправки запроса
-            throw new NotCorrectRequestException("Во время выполнения запроса возникла ошибка.");
-        }
-    }
+    public String load(String key) {
+        URI load = URI.create(url + port + "/load/" + key + "?API_TOKEN=" + apiToken);
+        HttpRequest request = HttpRequest.newBuilder()
+                .GET()
+                .uri(load)
+                .header("Content-Type", "application/json")
+                .build();
 
-    public String load(String key) { // Метод должен возвращать состояние менеджера задач через запрос GET /load/<ключ>?API_TOKEN=
-        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(url + "/load" + key + "?API_TOKEN=" + apiToken)).header("Content-Type", "application/json").GET().build();
+        HttpClient client = HttpClient.newHttpClient();
+        HttpResponse.BodyHandler<String> handler = HttpResponse.BodyHandlers.ofString();
+        HttpResponse<String> response;
         try {
-            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-            if (response.statusCode() != 200) {
-                throw new NotCorrectRequestException("Во время выполнения запроса возникла ошибка.");
-            }
-            return response.body();
-        } catch (IOException | InterruptedException e) { // обрабатываем ошибки отправки запроса
-            throw new NotCorrectRequestException("Во время выполнения запроса возникла ошибка.");
+            response = client.send(request, handler);
+        } catch (IOException | InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new ManagerLoadException("Can't load from server" + e.getMessage());
         }
+        if (StringUtils.isBlank(response.body())) {
+            throw new ManagerLoadException("Can't load from server");
+        }
+        return response.body();
     }
 }
