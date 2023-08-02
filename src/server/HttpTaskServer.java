@@ -38,11 +38,10 @@ public class HttpTaskServer {
             create();
     private static final int PORT_HTTP_TASK_MANAGER = 8078;
     private static final String URL = "http://localhost:";
-    private static final String KEY = "TEST";
     private static final String WRONG_METHOD = "Wrong method";
     private static final String WRONG_TYPE = "Wrong type";
     private static final String TASKS_PATH = "/tasks";
-    private final TaskManager httpTaskManager = Managers.getDefault(URL, PORT_HTTP_TASK_MANAGER, KEY);
+    private final TaskManager httpTaskManager = Managers.getDefault(URL, PORT_HTTP_TASK_MANAGER);
     private HttpServer httpServer;
 
     public void start() {

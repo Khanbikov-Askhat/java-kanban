@@ -15,11 +15,9 @@ public class HttpTaskManager extends FileBackedTasksManager {
             registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter()).
             create();
     private final KVTaskClient kvTaskClient;
-    private String key;
 
-    public HttpTaskManager(String url, int port, String key) {
+    public HttpTaskManager(String url, int port) {
         this.kvTaskClient = new KVTaskClient(url, port);
-        this.key = key;
     }
 
     @Override
