@@ -672,7 +672,6 @@ public class HttpTaskServerTest {
         try {
             response = client.send(httpRequest, HttpResponse.BodyHandlers.ofString());
         } catch (IOException | InterruptedException e) {
-            Thread.currentThread().interrupt();
             throw new ResponseException("No response from server");
         }
         return response.body();

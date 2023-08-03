@@ -13,9 +13,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 
 public class KVServer {
-    private final String apiToken;
-    private final HttpServer server;
-    private final Map<String, String> data = new HashMap<>();
+
     public static final String GET = "GET";
     public static final String POST = "POST";
     public static final String DELETE = "DELETE";
@@ -25,6 +23,9 @@ public class KVServer {
     public static final int FORBIDDEN = 403;
     public static final int NOT_FOUND = 404;
     public static final int METHOD_NOT_ALLOWED = 405;
+    private final String apiToken;
+    private final HttpServer server;
+    private final Map<String, String> data = new HashMap<>();
 
     public KVServer(int port) {
         this.apiToken = generateApiToken();
@@ -45,19 +46,22 @@ public class KVServer {
                 return;
             }
             if (GET.equals(exchange.getRequestMethod())) {
-                String key = exchange.getRequestURI().getPath().substring("/load/".length());
+                String key = exchange.getRequestURI().getPath().substring("/save/".length());
                 if (key.isEmpty()) {
+                    System.out.println("Key для сохранения пустой. key указывается в пути: /save/{key}");
                     exchange.sendResponseHeaders(BAD_REQUEST, 0);
                     return;
                 }
-                if (data.containsKey(key)) {
-                    exchange.sendResponseHeaders(OK, 0);
-                    byte[] value = data.get(key).getBytes(UTF_8);
-                    exchange.getResponseBody().write(value);
-                } else {
-                    exchange.sendResponseHeaders(BAD_REQUEST, 0);
+                if (!data.containsKey(key)) {
+                    System.out.println("Не могу достать данные для ключа '" + key + "', данные отсутствуют");
+                    exchange.sendResponseHeaders(NOT_FOUND, 0);
+                    return;
                 }
+                sendText(exchange, data.get(key));
+                System.out.println("Значение для ключа " + key + " успешно отправлено в ответ на запрос!");
+                exchange.sendResponseHeaders(OK, 0);
             } else {
+                System.out.println("/save ждёт GET-запрос, а получил: " + exchange.getRequestMethod());
                 exchange.sendResponseHeaders(METHOD_NOT_ALLOWED, 0);
             }
         }
@@ -72,17 +76,20 @@ public class KVServer {
             if (POST.equals(exchange.getRequestMethod())) {
                 String key = exchange.getRequestURI().getPath().substring("/save/".length());
                 if (key.isEmpty()) {
+                    System.out.println("Key для сохранения пустой. key указывается в пути: /save/{key}");
                     exchange.sendResponseHeaders(BAD_REQUEST, 0);
                     return;
                 }
                 String value = readText(exchange);
                 if (value.isEmpty()) {
+                    System.out.println("Данные value отсутствуют");
                     exchange.sendResponseHeaders(BAD_REQUEST, 0);
                     return;
                 }
                 data.put(key, value);
                 exchange.sendResponseHeaders(OK, 0);
             } else {
+                System.out.println("/save ждёт GET-запрос, а получил: " + exchange.getRequestMethod());
                 exchange.sendResponseHeaders(METHOD_NOT_ALLOWED, 0);
             }
         }

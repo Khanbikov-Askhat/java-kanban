@@ -1,7 +1,6 @@
 package server;
 
 import exceptions.*;
-import org.junit.platform.commons.util.StringUtils;
 
 import java.io.IOException;
 import java.net.URI;
@@ -17,7 +16,7 @@ public class KVTaskClient {
     public KVTaskClient(String url, int port) {
         this.port = port;
         this.url = url;
-        URI register = URI.create(url + port + "/register");
+        URI register = createURI(url, port, "/register");
         HttpRequest request = HttpRequest.newBuilder()
                 .GET()
                 .uri(register)
@@ -30,14 +29,13 @@ public class KVTaskClient {
         try {
             response = client.send(request, handler);
         } catch (IOException | InterruptedException e) {
-            Thread.currentThread().interrupt();
             throw new TaskClientRegisterException("Can't register " + e.getMessage());
         }
         apiToken = response.body();
     }
 
-    public void put(String key, String json) {
-        URI save = URI.create(url + port + "/save/" + key + "?API_TOKEN=" + apiToken);
+    public String put(String key, String json) {
+        URI save = createOperationURI(url, port, key, "/save/",apiToken);
         HttpRequest request = HttpRequest.newBuilder()
                 .POST(HttpRequest.BodyPublishers.ofString(json))
                 .uri(save)
@@ -45,39 +43,45 @@ public class KVTaskClient {
                 .build();
 
         HttpClient client = HttpClient.newHttpClient();
-        HttpResponse.BodyHandler<String> handler = HttpResponse.BodyHandlers.ofString();
-        HttpResponse<String> response;
         try {
-            response = client.send(request, handler);
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() != 200) {
+                throw new ManagerServerSaveException("Can't do save request, status code: " + response.statusCode());
+            }
+            return response.body();
         } catch (IOException | InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new ManagerServerSaveException("Can't save to server" + e.getMessage());
-        }
-        if (StringUtils.isBlank(String.valueOf(response)) || response.statusCode() != 200) {
-            throw new ManagerServerSaveException("Can't save to server");
+            throw new ManagerSaveException("Can't do save request", (IOException) e);
         }
     }
 
     public String load(String key) {
-        URI load = URI.create(url + port + "/load/" + key + "?API_TOKEN=" + apiToken);
+        URI load = createOperationURI(url, port, key, "/load/",apiToken);
         HttpRequest request = HttpRequest.newBuilder()
                 .GET()
                 .uri(load)
                 .header("Content-Type", "application/json")
                 .build();
-
         HttpClient client = HttpClient.newHttpClient();
-        HttpResponse.BodyHandler<String> handler = HttpResponse.BodyHandlers.ofString();
-        HttpResponse<String> response;
         try {
-            response = client.send(request, handler);
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() != 200) {
+                throw new ManagerLoadException("Can't load from server");
+            }
+            return response.body();
         } catch (IOException | InterruptedException e) {
-            Thread.currentThread().interrupt();
             throw new ManagerLoadException("Can't load from server" + e.getMessage());
         }
-        if (StringUtils.isBlank(response.body())) {
-            throw new ManagerLoadException("Can't load from server");
-        }
-        return response.body();
+    }
+
+    private URI createURI(String url, int port, String key) {
+        return  URI.create(url + port + key);
+    }
+
+    private URI createOperationURI(String url, int port, String key, String operationToken, String apiToken) {
+        return URI.create(url + port + operationToken + key + "?API_TOKEN=" + apiToken);
     }
 }
+/*
+Спасибо за ревью!
+В целом я вроде понял как это работает, вроде интересно обрабатывать запросы, но за всем уследить конечно тяжко.
+*/
